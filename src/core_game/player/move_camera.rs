@@ -2,10 +2,10 @@ use bevy::prelude::*;
 
 use crate::core_game::player::player_structs::CameraVariables;
 use crate::core_game::player::player_structs::Player;
+use crate::core_game::player::player_structs::PlayerCasts;
 use crate::core_game::player::player_structs::PlayerGraphics;
 use crate::core_game::player::player_structs::PlayerMoveState;
 use crate::core_game::player::player_structs::PlayerState;
-use crate::core_game::player::player_structs::PlayerCasts;
 
 use crate::core_game::player::player_structs::PlayerStateVariables;
 
@@ -15,7 +15,12 @@ pub fn move_camera(
 		(With<Camera>, Without<Player>, Without<PlayerGraphics>),
 	>,
 	qplayer: Query<
-		(&Transform, &PlayerState, &PlayerCasts, &PlayerStateVariables),
+		(
+			&Transform,
+			&PlayerState,
+			&PlayerCasts,
+			&PlayerStateVariables,
+		),
 		(With<Player>, Without<PlayerGraphics>, Without<Camera>),
 	>,
 ) {
@@ -31,7 +36,6 @@ pub fn move_camera(
 			let player_y = (player_transform.translation.y * 8.0) / 8.0;
 			let distance = camera_var.new_ground_height - camera_transform.translation.y;
 			let velocity = (scalar_y * distance * 8.0).round() / 8.0;
-
 
 			let is_wall_jumping = (state.new.0 == PlayerMoveState::Jump
 				|| state.new.0 == PlayerMoveState::Fall)

@@ -40,7 +40,7 @@ fn create_fps_counter(
 	};
 
 	commands
-		.spawn_bundle(TextBundle {
+		.spawn(TextBundle {
 			text: Text {
 				sections: vec![TextSection {
 					value: "FPS: ".to_string(),

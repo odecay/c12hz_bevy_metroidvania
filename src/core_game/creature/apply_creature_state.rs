@@ -25,7 +25,7 @@ pub fn apply_creature_state(
 			&CreatureState,
 			&CreatureStateVariables,
 			&CreatureGraphicsEntity,
-			&CreatureCasts
+			&CreatureCasts,
 		),
 		With<Creature>,
 	>,
@@ -34,8 +34,7 @@ pub fn apply_creature_state(
 	mut reset_velocity: Local<bool>,
 	mut chase_delay: Local<u32>,
 ) {
-	for (mut othervar, transform, mut velocity, speed, state, var, cg, cast) in query.iter_mut()
-	{
+	for (mut othervar, transform, mut velocity, speed, state, var, cg, cast) in query.iter_mut() {
 		if let Ok(mut sprite) = query2.get_mut(cg.0) {
 			for transform_player in query_player.iter_mut() {
 				let mut rng = thread_rng();
@@ -51,12 +50,10 @@ pub fn apply_creature_state(
 				if transform.translation.x - transform_player.translation.x < 0.0 {
 					player_position = 1.0
 				}
-				
+
 				if transform.translation.x - transform_player.translation.x > 0.0 {
 					player_position = -1.0
 				}
-				
-				
 
 				// PATROL
 				if state.new.0 == CreatureMoveState::Patrol {
@@ -96,8 +93,6 @@ pub fn apply_creature_state(
 					}
 				}
 
-				
-				
 				// IDLE
 				if state.new.0 == CreatureMoveState::Idle {
 					if velocity.x > 0.0 {
@@ -109,8 +104,6 @@ pub fn apply_creature_state(
 					}
 				}
 
-				
-				
 				// CHASE
 				if state.new.0 == CreatureMoveState::Chase {
 					if state.old.0 != CreatureMoveState::Chase {
@@ -133,8 +126,6 @@ pub fn apply_creature_state(
 					othervar.chase_delay = 0;
 				}
 
-				
-				
 				// ATTACK
 				if state.new.0 == CreatureMoveState::Attack {
 					velocity.x = 0.0;
@@ -152,9 +143,7 @@ pub fn apply_creature_state(
 				if state.new.0 != CreatureMoveState::Attack {
 					othervar.attack_delay = 0;
 				}
-				
-				
-				
+
 				// RETREAT
 				if state.new.0 == CreatureMoveState::Retreat {
 					if player_position == 1.0 {
@@ -164,28 +153,22 @@ pub fn apply_creature_state(
 						velocity.x = speed.x;
 					}
 				}
-				
+
 				// RETREAT
 				if state.new.0 == CreatureMoveState::RangedAttack {
 					velocity.x = 0.0;
 				}
-				
-				
-				
+
 				// DEFENCE
 				if state.new.0 == CreatureMoveState::Defence {
 					velocity.x = 0.0;
 				}
 
-				
-				
 				// COLLISIONS
 				if colliding {
 					velocity.x *= -1.0;
 				}
 
-				
-				
 				// SPRITE FLIP
 				if velocity.x < 0.0 {
 					sprite.flip_x = false;
@@ -193,7 +176,10 @@ pub fn apply_creature_state(
 				if velocity.x > 0.0 {
 					sprite.flip_x = true;
 				}
-				if state.new.0 == CreatureMoveState::Retreat || state.new.0 == CreatureMoveState::RangedAttack || state.new.0 == CreatureMoveState::Defence {
+				if state.new.0 == CreatureMoveState::Retreat
+					|| state.new.0 == CreatureMoveState::RangedAttack
+					|| state.new.0 == CreatureMoveState::Defence
+				{
 					if player_position == 1.0 {
 						sprite.flip_x = true;
 					}

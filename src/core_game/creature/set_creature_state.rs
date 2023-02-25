@@ -18,24 +18,21 @@ pub fn set_creature_state(
 			&Transform,
 			&mut CreatureState,
 			&mut CreatureStateVariables,
-			& CreatureCasts,
+			&CreatureCasts,
 		),
 		With<Creature>,
 	>,
 	query_player: Query<(&Transform, &StealthMode, &PlayerCasts), With<Player>>,
 ) {
-	
 	for (e, transform, mut state, mut var, cast) in query.iter_mut() {
 		let mut rng = thread_rng();
 		var.isolated = true;
 
 		for (transform_player, stealth, player_cast) in query_player.iter() {
-			
-			var.distance_from_player = (transform_player.translation.x - transform.translation.x).abs();
-			
-			
-			
-			// PATROL STATE 			
+			var.distance_from_player =
+				(transform_player.translation.x - transform.translation.x).abs();
+
+			// PATROL STATE
 			if !cast.sight_range && var.chase_timer == 0 || stealth.active {
 				if !var.switch && var.idle_timer == 0 {
 					var.patrol_timer = rng.gen_range(100..=300);
@@ -47,9 +44,7 @@ pub fn set_creature_state(
 					var.patrol_timer -= 1;
 				}
 			}
-			
-			
-			
+
 			// IDLE STATE
 			if !cast.sight_range && var.chase_timer == 0 || stealth.active {
 				if var.switch && var.patrol_timer == 0 {
@@ -62,16 +57,12 @@ pub fn set_creature_state(
 					var.idle_timer -= 1;
 				}
 			}
-			
-			
-			
+
 			// 'ISOLATED' STATE
 			if player_cast.nearby_enemies > 1 {
 				var.isolated = false;
 			}
 
-			
-			
 			// CHASE STATE
 			if transform.translation.x < transform_player.translation.x {
 				var.chase_direction = 1.0;
@@ -88,21 +79,16 @@ pub fn set_creature_state(
 				var.chase_timer -= 1;
 				if !cast.attack_range && !var.isolated {
 					state.old.0 = state.new.0;
-					state.new.0 = CreatureMoveState::Chase;	
+					state.new.0 = CreatureMoveState::Chase;
 				}
 			}
-			
-			
-			
+
 			// ATTACK STATE
 			if cast.attack_range && !var.isolated {
 				state.old.0 = state.new.0;
 				state.new.0 = CreatureMoveState::Attack;
-			}	
-			
+			}
 
-			
-			
 			// RANGED ATTACK STATE
 			if cast.sight_range && var.isolated {
 				state.old.0 = state.new.0;
@@ -121,15 +107,13 @@ pub fn set_creature_state(
 				var.retreat_timer = 0.0;
 				var.retreating_attack_timer = 0;
 			}
-			
+
 			// HELPING CHASE
 			if var.isolated && cast.help_range && var.distance_from_player >= 100.0 {
 				state.old.0 = state.new.0;
-				state.new.0 = CreatureMoveState::Chase;	
+				state.new.0 = CreatureMoveState::Chase;
 			}
-			
-			
-			
+
 			// RETREAT STATE
 			if cast.retreat_range && var.isolated {
 				if !var.switch2 && var.retreating_attack_timer == 0 {
@@ -147,18 +131,14 @@ pub fn set_creature_state(
 				var.retreat_timer = 0.0;
 				var.retreating_attack_timer = 0;
 			}
-				
-			
-			
-			
+
 			// DEFENCE STATE
 			if cast.defence_range && var.isolated {
 				state.old.0 = state.new.0;
 				state.new.0 = CreatureMoveState::Defence;
 			}
-			
+
 			//dbg!(state.new.0);
 		}
-
 	}
 }

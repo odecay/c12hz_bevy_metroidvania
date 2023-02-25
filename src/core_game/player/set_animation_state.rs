@@ -3,10 +3,10 @@ use bevy::prelude::*;
 use crate::core_game::player::player_structs::Player;
 use crate::core_game::player::player_structs::PlayerAnimationState;
 use crate::core_game::player::player_structs::PlayerAttackState;
+use crate::core_game::player::player_structs::PlayerCasts;
 use crate::core_game::player::player_structs::PlayerDirectionState;
 use crate::core_game::player::player_structs::PlayerMoveState;
 use crate::core_game::player::player_structs::PlayerState;
-use crate::core_game::player::player_structs::PlayerCasts;
 use crate::core_game::player::player_structs::PlayerStateVariables;
 
 // this function generates player states
@@ -28,7 +28,7 @@ pub fn set_animation_state(
 			&Transform,
 		),
 		With<Player>,
-	>,
+	>
 ) {
 	let mut attacking = false;
 

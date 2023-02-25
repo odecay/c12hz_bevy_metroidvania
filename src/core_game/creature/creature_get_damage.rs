@@ -8,15 +8,20 @@ use crate::core_game::player::player_structs::Player;
 use crate::core_game::player::player_structs::PlayerDamage;
 
 use crate::core_game::creature::creature_structs::CreatureGraphicsEntity;
-use crate::core_game::creature::creature_structs::CreatureStats;
 use crate::core_game::creature::creature_structs::CreatureState;
+use crate::core_game::creature::creature_structs::CreatureStats;
 
 use super::creature_structs::CreatureMoveState;
 
 pub fn creature_get_damage(
 	player: Query<(&PlayerDamage), With<Player>>,
 	mut creature: Query<
-		(&CreatureGraphicsEntity, &mut CreatureStats, &mut Transform, &CreatureState),
+		(
+			&CreatureGraphicsEntity,
+			&mut CreatureStats,
+			&mut Transform,
+			&CreatureState,
+		),
 		With<Creature>,
 	>,
 	mut creature_graphics: Query<(&mut TextureAtlasSprite), With<CreatureGraphics>>,

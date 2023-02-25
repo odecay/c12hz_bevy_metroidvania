@@ -134,7 +134,7 @@ pub fn player_deal_damage(
 						collider,
 						1.0,
 						QueryFilter::default()
-							.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_3))
+							.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_3)),
 					);
 
 					if let Some((entity, _toii)) = hit_rbg {

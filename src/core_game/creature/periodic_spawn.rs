@@ -6,8 +6,8 @@ use bevy_rapier2d::prelude::{Collider, CollisionGroups, Group, RigidBody};
 
 use crate::core_game::creature::creature_structs::AnimationParams;
 use crate::core_game::creature::creature_structs::Creature;
-use crate::core_game::creature::creature_structs::CreatureCasts;
 use crate::core_game::creature::creature_structs::CreatureAnimationState;
+use crate::core_game::creature::creature_structs::CreatureCasts;
 use crate::core_game::creature::creature_structs::CreatureDirectionState;
 use crate::core_game::creature::creature_structs::CreatureGraphics;
 use crate::core_game::creature::creature_structs::CreatureMoveState;
@@ -98,7 +98,7 @@ pub fn periodic_spawn(
 									sprite_direction: 1.0,
 									switch: false,
 									switch2: false,
-									distance_from_player: 0.0
+									distance_from_player: 0.0,
 								},
 							),
 							TimeDivisions {
@@ -154,31 +154,78 @@ pub fn periodic_spawn(
 					// SET UP GRAPHICS ENTITY
 
 					let perfect_transitions = true;
-					
-					let texture_handle_idle = asset_server.load("animations/creature/IcePaukIdle.png");
-					let texture_atlas_idle = TextureAtlas::from_grid(texture_handle_idle, Vec2::new(90.0, 90.0), 17, 1, None, None, );
+
+					let texture_handle_idle =
+						asset_server.load("animations/creature/IcePaukIdle.png");
+					let texture_atlas_idle = TextureAtlas::from_grid(
+						texture_handle_idle,
+						Vec2::new(90.0, 90.0),
+						17,
+						1,
+						None,
+						None,
+					);
 					let texture_atlas_handle_idle = texture_atlases.add(texture_atlas_idle);
-					
-					let texture_handle_walkf = asset_server.load("animations/creature/IcePaukWalk.png");
-					let texture_atlas_walkf = TextureAtlas::from_grid(texture_handle_walkf, Vec2::new(90.0, 90.0), 10, 1, None, None, );
+
+					let texture_handle_walkf =
+						asset_server.load("animations/creature/IcePaukWalk.png");
+					let texture_atlas_walkf = TextureAtlas::from_grid(
+						texture_handle_walkf,
+						Vec2::new(90.0, 90.0),
+						10,
+						1,
+						None,
+						None,
+					);
 					let texture_atlas_handle_walkf = texture_atlases.add(texture_atlas_walkf);
-					
-					let texture_handle_atk = asset_server.load("animations/creature/IcePaukOffensiveAttack.png");
-					let texture_atlas_atk = TextureAtlas::from_grid(texture_handle_atk, Vec2::new(90.0, 90.0), 11, 1, None, None, );
+
+					let texture_handle_atk =
+						asset_server.load("animations/creature/IcePaukOffensiveAttack.png");
+					let texture_atlas_atk = TextureAtlas::from_grid(
+						texture_handle_atk,
+						Vec2::new(90.0, 90.0),
+						11,
+						1,
+						None,
+						None,
+					);
 					let texture_atlas_handle_atk = texture_atlases.add(texture_atlas_atk);
-					
-					let texture_handle_retreat = asset_server.load("animations/creature/IcePaukRetreat.png");
-					let texture_atlas_retreat = TextureAtlas::from_grid(texture_handle_retreat, Vec2::new(90.0, 90.0), 10, 1, None, None, );
+
+					let texture_handle_retreat =
+						asset_server.load("animations/creature/IcePaukRetreat.png");
+					let texture_atlas_retreat = TextureAtlas::from_grid(
+						texture_handle_retreat,
+						Vec2::new(90.0, 90.0),
+						10,
+						1,
+						None,
+						None,
+					);
 					let texture_atlas_handle_retreat = texture_atlases.add(texture_atlas_retreat);
-					
-					let texture_handle_ranged = asset_server.load("animations/creature/IcePaukRangedAttack.png");
-					let texture_atlas_ranged = TextureAtlas::from_grid(texture_handle_ranged, Vec2::new(90.0, 90.0), 15, 1, None, None, );
+
+					let texture_handle_ranged =
+						asset_server.load("animations/creature/IcePaukRangedAttack.png");
+					let texture_atlas_ranged = TextureAtlas::from_grid(
+						texture_handle_ranged,
+						Vec2::new(90.0, 90.0),
+						15,
+						1,
+						None,
+						None,
+					);
 					let texture_atlas_handle_ranged = texture_atlases.add(texture_atlas_ranged);
-					
-					let texture_handle_defence = asset_server.load("animations/creature/IcePaukDefence.png");
-					let texture_atlas_defence = TextureAtlas::from_grid(texture_handle_defence, Vec2::new(90.0, 90.0), 5, 1, None, None, );
+
+					let texture_handle_defence =
+						asset_server.load("animations/creature/IcePaukDefence.png");
+					let texture_atlas_defence = TextureAtlas::from_grid(
+						texture_handle_defence,
+						Vec2::new(90.0, 90.0),
+						5,
+						1,
+						None,
+						None,
+					);
 					let texture_atlas_handle_defence = texture_atlases.add(texture_atlas_defence);
-					
 
 					commands.insert_resource(MyCreatureAnimations {
 						idle: AnimationParams {

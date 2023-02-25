@@ -13,6 +13,7 @@ use crate::core_game::player::player_structs::Player;
 use crate::core_game::player::player_structs::PlayerAbilities;
 use crate::core_game::player::player_structs::PlayerAnimationState;
 use crate::core_game::player::player_structs::PlayerAttackState;
+use crate::core_game::player::player_structs::PlayerCasts;
 use crate::core_game::player::player_structs::PlayerDamage;
 use crate::core_game::player::player_structs::PlayerDamageStats;
 use crate::core_game::player::player_structs::PlayerDirectionState;
@@ -29,8 +30,6 @@ use crate::core_game::player::player_structs::StealthMode;
 use crate::core_game::player::player_structs::TimeDivisions;
 use crate::core_game::player::player_structs::Vel;
 use crate::core_game::player::player_structs::WallKick;
-use crate::core_game::player::player_structs::PlayerCasts;
-
 
 use super::player_structs::SoundParams;
 

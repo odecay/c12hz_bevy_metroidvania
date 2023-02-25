@@ -416,8 +416,7 @@ pub fn apply_player_state(
 				{
 					if state.new.3 == PlayerAttackState::None {
 						velocity.x = ((velocity.x / 1.5) * 8.0).round() / 8.0;
-					}
-					else {
+					} else {
 						velocity.x = 0.0;
 					}
 				}
