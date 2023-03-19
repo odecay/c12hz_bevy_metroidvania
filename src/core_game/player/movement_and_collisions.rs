@@ -7,10 +7,10 @@ use bevy_rapier2d::{
 
 use crate::core_game::player::player_structs::Player;
 use crate::core_game::player::player_structs::PlayerMoveState;
-use crate::core_game::player::player_structs::PlayerState;
+use crate::core_game::player::player_structs::PlayerStateBuffer;
 
 pub fn movement_and_collisions(
-	mut queryyy: Query<(Entity, &mut Transform, &Collider, &Vel, &PlayerState), With<Player>>,
+	mut queryyy: Query<(Entity, &mut Transform, &Collider, &Vel, &PlayerStateBuffer), With<Player>>,
 	rapier_context: Res<RapierContext>,
 ) {
 	for (entity, mut transform, collider, velocity, state) in queryyy.iter_mut() {
@@ -71,9 +71,9 @@ pub fn movement_and_collisions(
 		//this ensures there are no ugly long decimal points in the player transform whenever possible
 
 		if collided == false
-			&& (state.new.0 == PlayerMoveState::Idle
-				|| state.new.0 == PlayerMoveState::Run
-				|| state.new.0 == PlayerMoveState::Whirlwind)
+			&& (state.new.movement == PlayerMoveState::Idle
+				|| state.new.movement == PlayerMoveState::Run
+				|| state.new.movement == PlayerMoveState::Whirlwind)
 		{
 			let hit1 = rapier_context.cast_shape(
 				transform.translation.truncate(),

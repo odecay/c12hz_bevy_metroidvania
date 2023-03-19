@@ -6,7 +6,7 @@ use crate::core_game::player::player_structs::PlayerAttackState;
 use crate::core_game::player::player_structs::PlayerCasts;
 use crate::core_game::player::player_structs::PlayerDirectionState;
 use crate::core_game::player::player_structs::PlayerMoveState;
-use crate::core_game::player::player_structs::PlayerState;
+use crate::core_game::player::player_structs::PlayerStateBuffer;
 use crate::core_game::player::player_structs::PlayerStateVariables;
 
 // this function generates player states
@@ -22,7 +22,7 @@ use crate::core_game::player::player_structs::PlayerStateVariables;
 pub fn set_animation_state(
 	mut query: Query<
 		(
-			&mut PlayerState,
+			&mut PlayerStateBuffer,
 			&mut PlayerStateVariables,
 			&PlayerCasts,
 			&Transform,
@@ -33,13 +33,13 @@ pub fn set_animation_state(
 	let mut attacking = false;
 
 	for (mut state, mut var, cast, transform) in query.iter_mut() {
-		if state.new.3 != PlayerAttackState::None {
+		if state.new.attack != PlayerAttackState::None {
 			attacking = true;
 		}
 
 		// RESET PARAMETERS WHEN STATE CHANGES
 
-		if state.new.0 != state.old.0 {
+		if state.new.movement != state.old.movement {
 			var.runidle_counter = 0;
 			var.idlewhirl_counter = 0;
 			var.whirlidle_counter = 0;
@@ -49,49 +49,53 @@ pub fn set_animation_state(
 		let frame_duration = 5;
 
 		//RUN > IDLE TRANSITION ANIMATION STATE
-		if state.old.0 == PlayerMoveState::Run && state.new.0 == PlayerMoveState::Idle && !attacking
+		if state.old.movement == PlayerMoveState::Run
+			&& state.new.movement == PlayerMoveState::Idle
+			&& !attacking
 		{
 			frame_count = 5;
 			var.runidle_counter = (frame_count * frame_duration) + 1;
 		}
 
 		if var.runidle_counter > 0 {
-			state.old.2 = state.new.2;
-			state.new.2 = PlayerAnimationState::RunIdle;
+			state.old.animation = state.new.animation;
+			state.new.animation = PlayerAnimationState::RunIdle;
 			var.runidle_counter -= 1;
 		}
 
 		//IDLE > WHIRLWIND STATE - currently something is not working > stuck in transition animation when trying to use when not running
-		if state.old.0 == PlayerMoveState::Idle
-			&& state.new.0 == PlayerMoveState::Whirlwind
+		if state.old.movement == PlayerMoveState::Idle
+			&& state.new.movement == PlayerMoveState::Whirlwind
 			&& !attacking
 		{
 			frame_count = 2;
 			var.idlewhirl_counter = (frame_count * frame_duration) + 1;
 		}
 		if var.idlewhirl_counter > 0 {
-			state.old.2 = state.new.2;
-			state.new.2 = PlayerAnimationState::IdleWhirlwind;
+			state.old.animation = state.new.animation;
+			state.new.animation = PlayerAnimationState::IdleWhirlwind;
 			var.idlewhirl_counter -= 1;
 		}
 
 		//WHIRLWIND > IDLE STATE
-		if state.old.0 == PlayerMoveState::Whirlwind
-			&& state.new.0 == PlayerMoveState::Idle
+		if state.old.movement == PlayerMoveState::Whirlwind
+			&& state.new.movement == PlayerMoveState::Idle
 			&& !attacking
 		{
 			frame_count = 2;
 			var.whirlidle_counter = (frame_count * frame_duration) + 1;
 		}
 		if var.whirlidle_counter > 0 {
-			state.old.2 = state.new.2;
-			state.new.2 = PlayerAnimationState::WhirlwindIdle;
+			state.old.animation = state.new.animation;
+			state.new.animation = PlayerAnimationState::WhirlwindIdle;
 			var.whirlidle_counter -= 1;
 		}
 
 		// FALL > IDLE STATE
 
-		if state.old.0 == PlayerMoveState::Fall && state.new.0 == PlayerMoveState::Run && !attacking
+		if state.old.movement == PlayerMoveState::Fall
+			&& state.new.movement == PlayerMoveState::Run
+			&& !attacking
 		{
 			//frame_count = 1;
 			//var.fallidle_counter = (frame_count * frame_duration) + 1;
@@ -109,114 +113,114 @@ pub fn set_animation_state(
 
 		// IDLE ANIMATION STATE
 		if currently_transitioning == false && !attacking {
-			if state.new.0 == PlayerMoveState::Idle {
-				state.old.2 = state.new.2;
-				state.new.2 = PlayerAnimationState::Idle;
+			if state.new.movement == PlayerMoveState::Idle {
+				state.old.animation = state.new.animation;
+				state.new.animation = PlayerAnimationState::Idle;
 			}
 		}
 
 		// RUN ANIMATION STATE
 		if currently_transitioning == false && !attacking {
-			if state.new.0 == PlayerMoveState::Run {
-				state.old.2 = state.new.2;
-				state.new.2 = PlayerAnimationState::Run;
+			if state.new.movement == PlayerMoveState::Run {
+				state.old.animation = state.new.animation;
+				state.new.animation = PlayerAnimationState::Run;
 			}
 		}
 
 		// JUMP ANIMATION STATE
 		if currently_transitioning == false && !attacking {
-			if state.new.0 == PlayerMoveState::Jump {
-				state.old.2 = state.new.2;
-				state.new.2 = PlayerAnimationState::Jump;
+			if state.new.movement == PlayerMoveState::Jump {
+				state.old.animation = state.new.animation;
+				state.new.animation = PlayerAnimationState::Jump;
 			}
 		}
 
 		// FALL ANIMATION STATE
 		if currently_transitioning == false && !attacking {
-			if state.new.0 == PlayerMoveState::Fall {
-				state.old.2 = state.new.2;
-				state.new.2 = PlayerAnimationState::Fall;
+			if state.new.movement == PlayerMoveState::Fall {
+				state.old.animation = state.new.animation;
+				state.new.animation = PlayerAnimationState::Fall;
 			}
 		}
 
 		// WALL SLIDE ANIMATION STATE
 		if currently_transitioning == false && !attacking {
-			if state.new.0 == PlayerMoveState::WallSlide {
+			if state.new.movement == PlayerMoveState::WallSlide {
 				if cast.wallslide_anim_up && cast.wallslide_anim_down {
-					state.old.2 = state.new.2;
-					state.new.2 = PlayerAnimationState::WallSlide;
+					state.old.animation = state.new.animation;
+					state.new.animation = PlayerAnimationState::WallSlide;
 				}
 
 				if !cast.wallslide_anim_up || !cast.wallslide_anim_down {
-					state.old.2 = state.new.2;
-					state.new.2 = PlayerAnimationState::Fall;
+					state.old.animation = state.new.animation;
+					state.new.animation = PlayerAnimationState::Fall;
 				}
 			}
 		}
 
 		// BASIC SWORD ATTACK ANIMATION STATE
-		if state.new.3 == PlayerAttackState::MeleeBasicSword {
-			state.old.2 = state.new.2;
-			state.new.2 = PlayerAnimationState::MeleeBasicSword;
+		if state.new.attack == PlayerAttackState::MeleeBasicSword {
+			state.old.animation = state.new.animation;
+			state.new.animation = PlayerAnimationState::MeleeBasicSword;
 			currently_transitioning = false
 		}
 
 		// BASIC HAMMER ATTACK ANIMATION STATE
-		if state.new.3 == PlayerAttackState::MeleeBasicHammer {
-			state.old.2 = state.new.2;
-			state.new.2 = PlayerAnimationState::MeleeBasicHammer;
+		if state.new.attack == PlayerAttackState::MeleeBasicHammer {
+			state.old.animation = state.new.animation;
+			state.new.animation = PlayerAnimationState::MeleeBasicHammer;
 			currently_transitioning = false
 		}
 
 		// BASIC BOW FORWARD ATTACK ANIMATION STATE
-		if state.new.3 == PlayerAttackState::RangedBasicBowForward {
-			state.old.2 = state.new.2;
-			state.new.2 = PlayerAnimationState::RangedBasicBowForward;
+		if state.new.attack == PlayerAttackState::RangedBasicBowForward {
+			state.old.animation = state.new.animation;
+			state.new.animation = PlayerAnimationState::RangedBasicBowForward;
 			currently_transitioning = false
 		}
 
 		// BASIC BOW UP ATTACK ANIMATION STATE
-		if state.new.3 == PlayerAttackState::RangedBasicBowUp {
-			state.old.2 = state.new.2;
-			state.new.2 = PlayerAnimationState::RangedBasicBowUp;
+		if state.new.attack == PlayerAttackState::RangedBasicBowUp {
+			state.old.animation = state.new.animation;
+			state.new.animation = PlayerAnimationState::RangedBasicBowUp;
 			currently_transitioning = false
 		}
 
 		// BASIC GUNS FORWARD ATTACK ANIMATION STATE
-		if state.new.3 == PlayerAttackState::RangedBasicGunsForward {
-			state.old.2 = state.new.2;
-			state.new.2 = PlayerAnimationState::RangedBasicGunsForward;
+		if state.new.attack == PlayerAttackState::RangedBasicGunsForward {
+			state.old.animation = state.new.animation;
+			state.new.animation = PlayerAnimationState::RangedBasicGunsForward;
 			currently_transitioning = false
 		}
 
 		// BASIC GUNS UP ATTACK ANIMATION STATE
-		if state.new.3 == PlayerAttackState::RangedBasicGunsUp {
-			state.old.2 = state.new.2;
-			state.new.2 = PlayerAnimationState::RangedBasicGunsUp;
+		if state.new.attack == PlayerAttackState::RangedBasicGunsUp {
+			state.old.animation = state.new.animation;
+			state.new.animation = PlayerAnimationState::RangedBasicGunsUp;
 			currently_transitioning = false
 		}
 
 		// WHIRLWIND ANIMATION STATE - currently something is not working > stuck in transition animation when trying to use when not running
 		if currently_transitioning == false {
-			if state.new.3 == PlayerAttackState::WhirlwindHammer {
-				state.old.2 = state.new.2;
-				state.new.2 = PlayerAnimationState::WhirlwindHammer;
+			if state.new.attack == PlayerAttackState::WhirlwindHammer {
+				state.old.animation = state.new.animation;
+				state.new.animation = PlayerAnimationState::WhirlwindHammer;
 			}
 		}
 
 		// WHIRLWIND ANIMATION STATE - currently something is not working > stuck in transition animation when trying to use when not running
 		if currently_transitioning == false {
-			if state.new.3 == PlayerAttackState::WhirlwindSword {
-				state.old.2 = state.new.2;
-				state.new.2 = PlayerAnimationState::WhirlwindSword;
+			if state.new.attack == PlayerAttackState::WhirlwindSword {
+				state.old.animation = state.new.animation;
+				state.new.animation = PlayerAnimationState::WhirlwindSword;
 			}
 		}
 
 		// DASH ANIMATION STATE
 		if currently_transitioning == false {
-			if state.new.3 == PlayerAttackState::DashForward {
-				state.old.2 = state.new.2;
-				state.new.2 = PlayerAnimationState::Run;
+			if state.new.attack == PlayerAttackState::DashForward {
+				state.old.animation = state.new.animation;
+				state.new.animation = PlayerAnimationState::Run;
 			}
 		}
 	}

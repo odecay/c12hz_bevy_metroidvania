@@ -6,7 +6,7 @@ use crate::core_game::player::player_structs::PlayerAbilities;
 use crate::core_game::player::player_structs::PlayerAttackState;
 use crate::core_game::player::player_structs::PlayerInput;
 use crate::core_game::player::player_structs::PlayerMoveState;
-use crate::core_game::player::player_structs::PlayerState;
+use crate::core_game::player::player_structs::PlayerStateBuffer;
 use crate::core_game::player::player_structs::PlayerWeaponMelee;
 use crate::core_game::player::player_structs::PlayerWeaponRanged;
 use crate::core_game::player::player_structs::PlayerWeapons;
@@ -14,7 +14,7 @@ use crate::core_game::player::player_structs::PlayerWeapons;
 pub fn set_attack_state(
 	mut query: Query<
 		(
-			&mut PlayerState,
+			&mut PlayerStateBuffer,
 			&PlayerInput,
 			&PlayerAbilities,
 			&PlayerWeapons,
@@ -107,15 +107,16 @@ pub fn set_attack_state(
 			}
 
 			if abil == Ability::Whirlwind
-				&& (state.new.0 == PlayerMoveState::Idle || state.new.0 == PlayerMoveState::Run)
+				&& (state.new.movement == PlayerMoveState::Idle
+					|| state.new.movement == PlayerMoveState::Run)
 			{
 				if weapon.melee == PlayerWeaponMelee::Hammer {
-					state.old.3 = state.new.3;
-					state.new.3 = PlayerAttackState::WhirlwindHammer;
+					state.old.attack = state.new.attack;
+					state.new.attack = PlayerAttackState::WhirlwindHammer;
 				}
 				if weapon.melee == PlayerWeaponMelee::Sword {
-					state.old.3 = state.new.3;
-					state.new.3 = PlayerAttackState::WhirlwindSword;
+					state.old.attack = state.new.attack;
+					state.new.attack = PlayerAttackState::WhirlwindSword;
 				}
 			}
 
@@ -130,54 +131,54 @@ pub fn set_attack_state(
 
 		// SET STATES BASED ON TIMERS
 		if *timer_mbh > 0 {
-			state.old.3 = state.new.3;
-			state.new.3 = PlayerAttackState::MeleeBasicHammer;
+			state.old.attack = state.new.attack;
+			state.new.attack = PlayerAttackState::MeleeBasicHammer;
 		}
 
 		if *timer_mbs > 0 {
-			state.old.3 = state.new.3;
-			state.new.3 = PlayerAttackState::MeleeBasicSword;
+			state.old.attack = state.new.attack;
+			state.new.attack = PlayerAttackState::MeleeBasicSword;
 		}
 
 		if *timer_rbbf > 0 {
-			state.old.3 = state.new.3;
-			state.new.3 = PlayerAttackState::RangedBasicBowForward;
+			state.old.attack = state.new.attack;
+			state.new.attack = PlayerAttackState::RangedBasicBowForward;
 		}
 
 		if *timer_rbbu > 0 {
-			state.old.3 = state.new.3;
-			state.new.3 = PlayerAttackState::RangedBasicBowUp;
+			state.old.attack = state.new.attack;
+			state.new.attack = PlayerAttackState::RangedBasicBowUp;
 		}
 
 		if *timer_rbgf > 0 {
-			state.old.3 = state.new.3;
-			state.new.3 = PlayerAttackState::RangedBasicGunsForward;
+			state.old.attack = state.new.attack;
+			state.new.attack = PlayerAttackState::RangedBasicGunsForward;
 		}
 
 		if *timer_rbgu > 0 {
-			state.old.3 = state.new.3;
-			state.new.3 = PlayerAttackState::RangedBasicGunsUp;
+			state.old.attack = state.new.attack;
+			state.new.attack = PlayerAttackState::RangedBasicGunsUp;
 		}
 
 		if *timer_df > 0 {
-			state.old.3 = state.new.3;
-			state.new.3 = PlayerAttackState::DashForward;
+			state.old.attack = state.new.attack;
+			state.new.attack = PlayerAttackState::DashForward;
 		}
 		if *timer_df == df {
 			*cooldown_df = cooldown_df_max * frame_length;
 		}
 
 		if *timer_dd45 > 0 {
-			state.old.3 = state.new.3;
-			state.new.3 = PlayerAttackState::DashDown45;
+			state.old.attack = state.new.attack;
+			state.new.attack = PlayerAttackState::DashDown45;
 		}
 		if *timer_dd45 == dd45 {
 			*cooldown_dd45 = cooldown_dd45_max * frame_length;
 		}
 
 		if !attack_timers_active {
-			state.old.3 = state.new.3;
-			state.new.3 = PlayerAttackState::None;
+			state.old.attack = state.new.attack;
+			state.new.attack = PlayerAttackState::None;
 		}
 
 		// RESET TIMERS AND COOLDOWNS

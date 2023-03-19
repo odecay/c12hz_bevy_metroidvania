@@ -8,8 +8,8 @@ use super::player_structs::{
 	Ability, AnimationParams, DamageKind, Grav, MoveSpeed, MyPlayerAnimations, MyPlayerSounds,
 	Player, PlayerAbilities, PlayerAnimationState, PlayerAttackState, PlayerCasts, PlayerDamage,
 	PlayerDamageStats, PlayerDirectionState, PlayerGraphics, PlayerInput, PlayerMoveState,
-	PlayerState, PlayerStateVariables, PlayerWeaponMelee, PlayerWeaponRanged, PlayerWeapons,
-	RandomValues, SoundParams, StealthMode, TimeDivisions, Vel, WallKick,
+	PlayerState, PlayerStateBuffer, PlayerStateVariables, PlayerWeaponMelee, PlayerWeaponRanged,
+	PlayerWeapons, RandomValues, SoundParams, StealthMode, TimeDivisions, Vel, WallKick,
 };
 
 // use super::player_structs::*;
@@ -103,19 +103,9 @@ pub fn setup_player(
 					penetrating_enemy: false,
 					sprite_flipped: false,
 				},
-				PlayerState {
-					old: (
-						PlayerMoveState::Idle,
-						PlayerDirectionState::Right,
-						PlayerAnimationState::Idle,
-						PlayerAttackState::None,
-					),
-					new: (
-						PlayerMoveState::Idle,
-						PlayerDirectionState::Right,
-						PlayerAnimationState::Idle,
-						PlayerAttackState::None,
-					),
+				PlayerStateBuffer {
+					old: PlayerState::default(),
+					new: PlayerState::default(),
 				},
 				Facing::Left,
 				PlayerDamage {

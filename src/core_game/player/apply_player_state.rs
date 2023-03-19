@@ -8,7 +8,7 @@ use crate::core_game::player::player_structs::PlayerDirectionState;
 use crate::core_game::player::player_structs::PlayerGraphics;
 use crate::core_game::player::player_structs::PlayerInput;
 use crate::core_game::player::player_structs::PlayerMoveState;
-use crate::core_game::player::player_structs::PlayerState;
+use crate::core_game::player::player_structs::PlayerStateBuffer;
 use crate::core_game::player::player_structs::StealthMode;
 use crate::core_game::player::player_structs::Vel;
 use crate::core_game::player::player_structs::WallKick;
@@ -31,7 +31,7 @@ use super::player_structs::PlayerAttackState;
 pub fn apply_player_state(
 	mut query: Query<
 		(
-			&PlayerState,
+			&PlayerStateBuffer,
 			&PlayerStateVariables,
 			&MoveSpeed,
 			&mut Vel,
@@ -57,10 +57,10 @@ pub fn apply_player_state(
 
 			//FLIP SPRITE
 
-			// if state.new.1 == PlayerDirectionState::Right {
+			// if state.new.direction == PlayerDirectionState::Right {
 			// 	sprite.flip_x = false;
 			// }
-			// if state.new.1 == PlayerDirectionState::Left {
+			// if state.new.direction == PlayerDirectionState::Left {
 			// 	sprite.flip_x = true;
 			// }
 			//
@@ -79,7 +79,8 @@ pub fn apply_player_state(
 					blue: 1.0,
 					alpha: 0.2,
 				};
-				if state.new.0 == PlayerMoveState::Run || state.new.0 == PlayerMoveState::Whirlwind
+				if state.new.movement == PlayerMoveState::Run
+					|| state.new.movement == PlayerMoveState::Whirlwind
 				{
 					speed_x = stealth.speed_x;
 				}
@@ -94,9 +95,9 @@ pub fn apply_player_state(
 
 			// IDLE
 
-			if state.new.0 == PlayerMoveState::Idle {
+			if state.new.movement == PlayerMoveState::Idle {
 				// Deceleration in the Right direction
-				if state.old.1 == PlayerDirectionState::Right {
+				if state.old.direction == PlayerDirectionState::Right {
 					velocity.dir = 1.0;
 				}
 				if velocity.dir == 1.0 {
@@ -110,7 +111,7 @@ pub fn apply_player_state(
 				}
 
 				// Deceleration in the Left direction
-				if state.old.1 == PlayerDirectionState::Left {
+				if state.old.direction == PlayerDirectionState::Left {
 					velocity.dir = -1.0;
 				}
 				if velocity.dir == -1.0 {
@@ -131,12 +132,12 @@ pub fn apply_player_state(
 
 			// RUN
 
-			if state.new.0 == PlayerMoveState::Run {
-				if state.new.1 != state.old.1 {
+			if state.new.movement == PlayerMoveState::Run {
+				if state.new.direction != state.old.direction {
 					velocity.x = 0.0;
 				}
 				// Acceleration + Run in the Right direction
-				if state.new.1 == PlayerDirectionState::Right {
+				if state.new.direction == PlayerDirectionState::Right {
 					if velocity.x < speed_x {
 						velocity.x += 0.5;
 					}
@@ -145,7 +146,7 @@ pub fn apply_player_state(
 					}
 				}
 				// Acceleration + Run in the Left direction
-				if state.new.1 == PlayerDirectionState::Left {
+				if state.new.direction == PlayerDirectionState::Left {
 					if velocity.x > -speed_x {
 						velocity.x -= 0.5;
 					}
@@ -162,17 +163,17 @@ pub fn apply_player_state(
 
 			// JUMP
 
-			if state.new.0 == PlayerMoveState::Jump {
-				if state.new.1 != state.old.1 {
+			if state.new.movement == PlayerMoveState::Jump {
+				if state.new.direction != state.old.direction {
 					velocity.x = 0.0;
 				}
 
-				if state.new.0 != state.old.0 {
+				if state.new.movement != state.old.movement {
 					velocity.y = 0.0;
 					velocity.y += speed.y;
 				}
 
-				if state.new.0 != state.old.0 {
+				if state.new.movement != state.old.movement {
 					gravity.counter = 0;
 				}
 
@@ -191,7 +192,7 @@ pub fn apply_player_state(
 				}
 
 				// Acceleration + Jump in the Right direction
-				if state.new.1 == PlayerDirectionState::Right {
+				if state.new.direction == PlayerDirectionState::Right {
 					if velocity.x < speed_x {
 						velocity.x += 0.25;
 					}
@@ -201,7 +202,7 @@ pub fn apply_player_state(
 				}
 
 				// Acceleration + Jump in the Left direction
-				if state.new.1 == PlayerDirectionState::Left {
+				if state.new.direction == PlayerDirectionState::Left {
 					if velocity.x > -speed_x {
 						velocity.x -= 0.25;
 					}
@@ -211,12 +212,12 @@ pub fn apply_player_state(
 				}
 
 				// Deceleration during Jump, currently instant (feels precise)
-				if state.new.1 == PlayerDirectionState::None {
+				if state.new.direction == PlayerDirectionState::None {
 					velocity.x = 0.0;
 				}
 
 				// Wall Jump
-				if state.old.0 == PlayerMoveState::WallSlide {
+				if state.old.movement == PlayerMoveState::WallSlide {
 					wall_kick.timer += 1;
 					if move_right && !move_left {
 						wall_kick.wall_direction = 1.0;
@@ -239,12 +240,14 @@ pub fn apply_player_state(
 
 			// FALL
 
-			if state.new.0 == PlayerMoveState::Fall {
-				if state.new.1 != state.old.1 {
+			if state.new.movement == PlayerMoveState::Fall {
+				if state.new.direction != state.old.direction {
 					velocity.x = 0.0;
 				}
 
-				if state.old.0 == PlayerMoveState::Idle || state.old.0 == PlayerMoveState::Run {
+				if state.old.movement == PlayerMoveState::Idle
+					|| state.old.movement == PlayerMoveState::Run
+				{
 					if velocity.y > 0.0 {
 						velocity.y = 0.0;
 					}
@@ -252,7 +255,7 @@ pub fn apply_player_state(
 				}
 
 				// Adds a bit of smoothing when players end jump early, so velocity doesn't go to 0 instantly
-				if state.old.0 == PlayerMoveState::Jump {
+				if state.old.movement == PlayerMoveState::Jump {
 					if velocity.y > 0.0 {
 						velocity.y = (velocity.y / 3.0).round();
 					}
@@ -274,7 +277,7 @@ pub fn apply_player_state(
 				}
 
 				// Acceleration + Fall in the Right direction
-				if state.new.1 == PlayerDirectionState::Right {
+				if state.new.direction == PlayerDirectionState::Right {
 					if velocity.x < speed_x {
 						velocity.x += 1.0;
 					}
@@ -284,7 +287,7 @@ pub fn apply_player_state(
 				}
 
 				// Acceleration + Fall in the Left direction
-				if state.new.1 == PlayerDirectionState::Left {
+				if state.new.direction == PlayerDirectionState::Left {
 					if velocity.x > -speed_x {
 						velocity.x -= 1.0;
 					}
@@ -294,22 +297,24 @@ pub fn apply_player_state(
 				}
 
 				// Deceleration during Fall, currently instant (feels precise)
-				if state.new.1 == PlayerDirectionState::None {
+				if state.new.direction == PlayerDirectionState::None {
 					velocity.x = 0.0;
 				}
 			}
 
 			// WALL SLIDE
 
-			if state.new.0 == PlayerMoveState::WallSlide {
-				if state.old.0 == PlayerMoveState::Idle || state.old.0 == PlayerMoveState::Run {
+			if state.new.movement == PlayerMoveState::WallSlide {
+				if state.old.movement == PlayerMoveState::Idle
+					|| state.old.movement == PlayerMoveState::Run
+				{
 					if velocity.y > 0.0 {
 						velocity.y = 0.0;
 					}
 					gravity.counter = 3;
 				}
 
-				if state.old.0 == PlayerMoveState::Jump {
+				if state.old.movement == PlayerMoveState::Jump {
 					if velocity.y > 0.0 {
 						velocity.y = 0.0;
 					}
@@ -330,26 +335,26 @@ pub fn apply_player_state(
 					velocity.y = -gravity.slide_speed;
 				}
 
-				if state.new.1 == PlayerDirectionState::Right {
+				if state.new.direction == PlayerDirectionState::Right {
 					velocity.x = speed_x;
 				}
 
-				if state.new.1 == PlayerDirectionState::Left {
+				if state.new.direction == PlayerDirectionState::Left {
 					velocity.x = -speed_x;
 				}
 
-				if state.new.1 == PlayerDirectionState::None {
+				if state.new.direction == PlayerDirectionState::None {
 					velocity.x = 0.0;
 				}
 			}
 
 			// WHIRLWIND
 
-			if state.new.0 == PlayerMoveState::Whirlwind {
-				if state.new.1 != state.old.1 {
+			if state.new.movement == PlayerMoveState::Whirlwind {
+				if state.new.direction != state.old.direction {
 					velocity.x = 0.0;
 				}
-				if state.new.1 == PlayerDirectionState::Right {
+				if state.new.direction == PlayerDirectionState::Right {
 					if velocity.x < speed_x {
 						velocity.x += 2.5;
 					}
@@ -358,7 +363,7 @@ pub fn apply_player_state(
 					}
 				}
 
-				if state.new.1 == PlayerDirectionState::Left {
+				if state.new.direction == PlayerDirectionState::Left {
 					if velocity.x > -speed_x {
 						velocity.x -= 2.5;
 					}
@@ -367,7 +372,7 @@ pub fn apply_player_state(
 					}
 				}
 
-				if state.new.1 == PlayerDirectionState::None {
+				if state.new.direction == PlayerDirectionState::None {
 					velocity.x = 0.0;
 				}
 				gravity.speed = 0.0;
@@ -377,26 +382,30 @@ pub fn apply_player_state(
 
 			// DASH
 
-			if state.new.0 == PlayerMoveState::DashForward {
+			if state.new.movement == PlayerMoveState::DashForward {
 				velocity.y = 0.0;
 				velocity.x = 4.5 * looking_direction;
 			}
-			if state.old.0 == PlayerMoveState::DashForward && state.new.0 == PlayerMoveState::Idle {
+			if state.old.movement == PlayerMoveState::DashForward
+				&& state.new.movement == PlayerMoveState::Idle
+			{
 				velocity.x = 0.0;
 			}
-			if state.old.0 == PlayerMoveState::DashForward && state.new.0 == PlayerMoveState::Run {
+			if state.old.movement == PlayerMoveState::DashForward
+				&& state.new.movement == PlayerMoveState::Run
+			{
 				velocity.x = speed.x * looking_direction;
 			}
 
 			// DASH STRIKE
 
-			if state.new.0 == PlayerMoveState::DashDown45 {
+			if state.new.movement == PlayerMoveState::DashDown45 {
 				velocity.y = -6.0;
 				velocity.x = 6.0 * looking_direction;
 				println!("X");
 			}
-			if state.old.0 == PlayerMoveState::DashDown45
-				&& state.new.0 != PlayerMoveState::DashDown45
+			if state.old.movement == PlayerMoveState::DashDown45
+				&& state.new.movement != PlayerMoveState::DashDown45
 			{
 				velocity.x = 0.0;
 				velocity.y = 0.0;
@@ -411,10 +420,10 @@ pub fn apply_player_state(
 
 			// ADD "FRICTION" BETWEEN PLAYER AND ENEMIES
 			if var.penetrating_enemy {
-				if !(state.new.0 == PlayerMoveState::DashForward
-					|| state.new.0 == PlayerMoveState::DashDown45)
+				if !(state.new.movement == PlayerMoveState::DashForward
+					|| state.new.movement == PlayerMoveState::DashDown45)
 				{
-					if state.new.3 == PlayerAttackState::None {
+					if state.new.attack == PlayerAttackState::None {
 						velocity.x = ((velocity.x / 1.5) * 8.0).round() / 8.0;
 					} else {
 						velocity.x = 0.0;

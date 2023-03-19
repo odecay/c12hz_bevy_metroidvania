@@ -137,20 +137,31 @@ pub enum PlayerAttackState {
 	None,
 }
 
-#[derive(Component, Debug)]
+#[derive(Debug)]
 pub struct PlayerState {
-	pub old: (
-		PlayerMoveState,
-		PlayerDirectionState,
-		PlayerAnimationState,
-		PlayerAttackState,
-	),
-	pub new: (
-		PlayerMoveState,
-		PlayerDirectionState,
-		PlayerAnimationState,
-		PlayerAttackState,
-	),
+	pub movement: PlayerMoveState,
+	pub direction: PlayerDirectionState,
+	pub animation: PlayerAnimationState,
+	pub attack: PlayerAttackState,
+}
+
+impl Default for PlayerState {
+	fn default() -> Self {
+		Self {
+			movement: PlayerMoveState::Idle,
+			direction: PlayerDirectionState::Right,
+			animation: PlayerAnimationState::Idle,
+			attack: PlayerAttackState::None,
+		}
+	}
+}
+
+#[derive(Component, Debug)]
+pub struct PlayerStateBuffer {
+	//rename to current
+	pub old: PlayerState,
+	//rename to next
+	pub new: PlayerState,
 }
 
 // various variables used for determining player state.

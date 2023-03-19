@@ -5,7 +5,7 @@ use crate::core_game::player::player_structs::Player;
 use crate::core_game::player::player_structs::PlayerCasts;
 use crate::core_game::player::player_structs::PlayerGraphics;
 use crate::core_game::player::player_structs::PlayerMoveState;
-use crate::core_game::player::player_structs::PlayerState;
+use crate::core_game::player::player_structs::PlayerStateBuffer;
 
 use crate::core_game::player::player_structs::PlayerStateVariables;
 
@@ -17,7 +17,7 @@ pub fn move_camera(
 	qplayer: Query<
 		(
 			&Transform,
-			&PlayerState,
+			&PlayerStateBuffer,
 			&PlayerCasts,
 			&PlayerStateVariables,
 		),
@@ -37,8 +37,8 @@ pub fn move_camera(
 			let distance = camera_var.new_ground_height - camera_transform.translation.y;
 			let velocity = (scalar_y * distance * 8.0).round() / 8.0;
 
-			let is_wall_jumping = (state.new.0 == PlayerMoveState::Jump
-				|| state.new.0 == PlayerMoveState::Fall)
+			let is_wall_jumping = (state.new.movement == PlayerMoveState::Jump
+				|| state.new.movement == PlayerMoveState::Fall)
 				&& (cast.big_left || cast.big_right)
 				&& var.walljump_counter > 0;
 
@@ -54,7 +54,9 @@ pub fn move_camera(
 				camera_transform.translation.z = player_transform.translation.z;
 			}
 
-			if state.new.0 == PlayerMoveState::Idle || state.new.0 == PlayerMoveState::Run {
+			if state.new.movement == PlayerMoveState::Idle
+				|| state.new.movement == PlayerMoveState::Run
+			{
 				camera_var.new_ground_height = player_y; //
 			} else if (camera_transform.translation.y - player_y) < -box_ceilling {
 				camera_var.new_ground_height = player_y; //

@@ -10,13 +10,13 @@ use crate::core_game::player::player_structs::PlayerAnimationState;
 use crate::core_game::player::player_structs::PlayerDamage;
 use crate::core_game::player::player_structs::PlayerDamageStats;
 use crate::core_game::player::player_structs::PlayerGraphics;
-use crate::core_game::player::player_structs::PlayerState;
+use crate::core_game::player::player_structs::PlayerStateBuffer;
 
 pub fn player_deal_damage(
 	mut physical: Query<
 		(
 			&Collider,
-			&PlayerState,
+			&PlayerStateBuffer,
 			&mut PlayerDamage,
 			&PlayerDamageStats,
 		),
@@ -52,7 +52,7 @@ pub fn player_deal_damage(
 
 			//MELEE BASIC HAMMER DAMAGE
 
-			if state.new.2 == PlayerAnimationState::MeleeBasicHammer && *cooldown == 0 {
+			if state.new.animation == PlayerAnimationState::MeleeBasicHammer && *cooldown == 0 {
 				hit_frame = hammer_hit_frame;
 
 				if sprite.index == hit_frame {
@@ -87,7 +87,7 @@ pub fn player_deal_damage(
 
 			//MELEE BASIC SWORD DAMAGE
 
-			if state.new.2 == PlayerAnimationState::MeleeBasicSword && *cooldown == 0 {
+			if state.new.animation == PlayerAnimationState::MeleeBasicSword && *cooldown == 0 {
 				hit_frame = sword_hit_frame;
 
 				if sprite.index == hit_frame {
@@ -122,7 +122,8 @@ pub fn player_deal_damage(
 
 			//RANGED BASIC GUNS FORWARD DAMAGE
 
-			if state.new.2 == PlayerAnimationState::RangedBasicGunsForward && *cooldown == 0 {
+			if state.new.animation == PlayerAnimationState::RangedBasicGunsForward && *cooldown == 0
+			{
 				hit_frame = guns_hit_frame;
 
 				if sprite.index == hit_frame {
@@ -152,7 +153,7 @@ pub fn player_deal_damage(
 
 			//WHIRLWIND DAMAGE
 
-			if state.new.2 == PlayerAnimationState::WhirlwindHammer && *cooldown == 0 {
+			if state.new.animation == PlayerAnimationState::WhirlwindHammer && *cooldown == 0 {
 				let mut targets_right = Vec::new();
 				let mut targets_left = Vec::new();
 				if sprite.index == 1 || sprite.index == 3 {

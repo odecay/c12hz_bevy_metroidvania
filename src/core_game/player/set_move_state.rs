@@ -8,7 +8,7 @@ use crate::core_game::player::player_structs::PlayerDamage;
 use crate::core_game::player::player_structs::PlayerDirectionState;
 use crate::core_game::player::player_structs::PlayerInput;
 use crate::core_game::player::player_structs::PlayerMoveState;
-use crate::core_game::player::player_structs::PlayerState;
+use crate::core_game::player::player_structs::PlayerStateBuffer;
 use crate::core_game::player::player_structs::PlayerStateVariables;
 use crate::core_game::player::player_structs::StealthMode;
 
@@ -27,7 +27,7 @@ pub fn set_move_state(
 		(
 			&Transform,
 			&PlayerDamage,
-			&mut PlayerState,
+			&mut PlayerStateBuffer,
 			&mut PlayerStateVariables,
 			&mut StealthMode,
 			&PlayerInput,
@@ -83,8 +83,8 @@ pub fn set_move_state(
 			&& !whirl
 		{
 			if cast.basic_down {
-				state.old.0 = state.new.0;
-				state.new.0 = PlayerMoveState::Idle;
+				state.old.movement = state.new.movement;
+				state.new.movement = PlayerMoveState::Idle;
 				var.jumps_remaining = max_jumps;
 				var.jump_frame_counter = 0;
 			}
@@ -95,8 +95,8 @@ pub fn set_move_state(
 			|| move_right && !jump_start && var.dash_counter == 0 && var.dash_strike_counter == 0
 		{
 			if cast.basic_down {
-				state.old.0 = state.new.0;
-				state.new.0 = PlayerMoveState::Run;
+				state.old.movement = state.new.movement;
+				state.new.movement = PlayerMoveState::Run;
 				var.jumps_remaining = max_jumps;
 			}
 		}
@@ -104,8 +104,8 @@ pub fn set_move_state(
 		// JUMP MOVE STATE
 		if jump_pressed && var.jumps_remaining > 0 && var.jump_frame_counter <= max_jump_duration {
 			if !cast.basic_up && var.dash_counter == 0 && var.dash_strike_counter == 0 {
-				state.old.0 = state.new.0;
-				state.new.0 = PlayerMoveState::Jump;
+				state.old.movement = state.new.movement;
+				state.new.movement = PlayerMoveState::Jump;
 				var.jump_frame_counter += 1;
 			} else {
 				var.jump_frame_counter = 100;
@@ -114,7 +114,9 @@ pub fn set_move_state(
 		if jump_pressed == false {
 			var.jump_frame_counter = 0;
 		}
-		if state.new.0 == PlayerMoveState::Fall && state.old.0 == PlayerMoveState::Jump {
+		if state.new.movement == PlayerMoveState::Fall
+			&& state.old.movement == PlayerMoveState::Jump
+		{
 			if var.jumps_remaining > 0 {
 				var.jumps_remaining -= 1;
 			}
@@ -127,8 +129,8 @@ pub fn set_move_state(
 				&& var.dash_counter == 0
 				&& var.dash_strike_counter == 0
 			{
-				state.old.0 = state.new.0;
-				state.new.0 = PlayerMoveState::Fall;
+				state.old.movement = state.new.movement;
+				state.new.movement = PlayerMoveState::Fall;
 			}
 		} else {
 			if cast.basic_up
@@ -136,7 +138,7 @@ pub fn set_move_state(
 				&& var.dash_counter == 0
 				&& var.dash_strike_counter == 0
 			{
-				state.new.0 = PlayerMoveState::Fall;
+				state.new.movement = PlayerMoveState::Fall;
 			}
 		}
 
@@ -146,8 +148,8 @@ pub fn set_move_state(
 		{
 			if !cast.basic_down {
 				if cast.directional_x && var.dash_counter == 0 && var.dash_strike_counter == 0 {
-					state.old.0 = state.new.0;
-					state.new.0 = PlayerMoveState::WallSlide;
+					state.old.movement = state.new.movement;
+					state.new.movement = PlayerMoveState::WallSlide;
 					var.jumps_remaining = max_jumps;
 				};
 			} else {
@@ -156,14 +158,16 @@ pub fn set_move_state(
 					&& var.dash_counter == 0
 					&& var.dash_strike_counter == 0
 				{
-					state.old.0 = state.new.0;
-					state.new.0 = PlayerMoveState::WallSlide;
+					state.old.movement = state.new.movement;
+					state.new.movement = PlayerMoveState::WallSlide;
 					var.jumps_remaining = max_jumps;
 					var.walljump_counter = 0;
 				}
 			}
 		}
-		if state.new.0 == PlayerMoveState::Jump && state.old.0 == PlayerMoveState::WallSlide {
+		if state.new.movement == PlayerMoveState::Jump
+			&& state.old.movement == PlayerMoveState::WallSlide
+		{
 			var.walljump_counter = 24;
 		} else if var.walljump_counter > 0 {
 			var.walljump_counter -= 1;
@@ -171,30 +175,30 @@ pub fn set_move_state(
 
 		// DIRECTION STATE
 		if move_right && !move_left {
-			state.old.1 = state.new.1;
-			state.new.1 = PlayerDirectionState::Right;
+			state.old.direction = state.new.direction;
+			state.new.direction = PlayerDirectionState::Right;
 			*facing = Facing::Right;
 		}
 		if move_left && !move_right {
-			state.old.1 = state.new.1;
-			state.new.1 = PlayerDirectionState::Left;
+			state.old.direction = state.new.direction;
+			state.new.direction = PlayerDirectionState::Left;
 			*facing = Facing::Left;
 		}
 		if !move_left && !move_right {
-			state.old.1 = state.new.1;
-			state.new.1 = PlayerDirectionState::None;
+			state.old.direction = state.new.direction;
+			state.new.direction = PlayerDirectionState::None;
 		}
 
 		// DASH MOVE STATE
-		if state.new.3 == PlayerAttackState::DashForward {
-			state.old.0 = state.new.0;
-			state.new.0 = PlayerMoveState::DashForward;
+		if state.new.attack == PlayerAttackState::DashForward {
+			state.old.movement = state.new.movement;
+			state.new.movement = PlayerMoveState::DashForward;
 		}
 
 		// DASH STRIKE STATE
-		if state.new.3 == PlayerAttackState::DashDown45 {
-			state.old.0 = state.new.0;
-			state.new.0 = PlayerMoveState::DashDown45;
+		if state.new.attack == PlayerAttackState::DashDown45 {
+			state.old.movement = state.new.movement;
+			state.new.movement = PlayerMoveState::DashDown45;
 		}
 
 		// STEALTH MODE
@@ -223,7 +227,7 @@ pub fn set_move_state(
 		//HORIZONTAL COLLISION CHECK (detects if player is currenlty actively pushing into a vertical wall collision,
 		//this is used by the apply_player_state function to make X velocity zero when colliding with vertical wall)
 		//this improves stuff with collision shape casting, nothing major but it gets rid of ugly numbers
-		if state.new.1 == PlayerDirectionState::Right {
+		if state.new.direction == PlayerDirectionState::Right {
 			if cast.basic_right {
 				var.actively_colliding = true;
 			} else {
@@ -231,7 +235,7 @@ pub fn set_move_state(
 			}
 		}
 
-		if state.new.1 == PlayerDirectionState::Left {
+		if state.new.direction == PlayerDirectionState::Left {
 			if cast.basic_left {
 				var.actively_colliding = true;
 			} else {
