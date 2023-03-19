@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use crate::core_game::animation::Facing;
 use crate::core_game::player::player_structs::Player;
 use crate::core_game::player::player_structs::PlayerAttackState;
 use crate::core_game::player::player_structs::PlayerCasts;
@@ -31,11 +32,14 @@ pub fn set_move_state(
 			&mut StealthMode,
 			&PlayerInput,
 			&PlayerCasts,
+			&mut Facing,
 		),
 		With<Player>,
 	>
 ) {
-	for (transform, damage, mut state, mut var, mut stealth, input, cast) in query.iter_mut() {
+	for (transform, damage, mut state, mut var, mut stealth, input, cast, mut facing) in
+		query.iter_mut()
+	{
 		// INITIATE VARIABLES
 		let jump_start = input.just_pressed_jump;
 		let jump_pressed = input.pressing_jump;
@@ -169,10 +173,12 @@ pub fn set_move_state(
 		if move_right && !move_left {
 			state.old.1 = state.new.1;
 			state.new.1 = PlayerDirectionState::Right;
+			*facing = Facing::Right;
 		}
 		if move_left && !move_right {
 			state.old.1 = state.new.1;
 			state.new.1 = PlayerDirectionState::Left;
+			*facing = Facing::Left;
 		}
 		if !move_left && !move_right {
 			state.old.1 = state.new.1;

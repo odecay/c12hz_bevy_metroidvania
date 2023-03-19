@@ -2,36 +2,17 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::{Collider, CollisionGroups, Group, RigidBody};
 
-use crate::core_game::player::player_structs::Ability;
-use crate::core_game::player::player_structs::AnimationParams;
-use crate::core_game::player::player_structs::DamageKind;
-use crate::core_game::player::player_structs::Grav;
-use crate::core_game::player::player_structs::MoveSpeed;
-use crate::core_game::player::player_structs::MyPlayerAnimations;
-use crate::core_game::player::player_structs::MyPlayerSounds;
-use crate::core_game::player::player_structs::Player;
-use crate::core_game::player::player_structs::PlayerAbilities;
-use crate::core_game::player::player_structs::PlayerAnimationState;
-use crate::core_game::player::player_structs::PlayerAttackState;
-use crate::core_game::player::player_structs::PlayerCasts;
-use crate::core_game::player::player_structs::PlayerDamage;
-use crate::core_game::player::player_structs::PlayerDamageStats;
-use crate::core_game::player::player_structs::PlayerDirectionState;
-use crate::core_game::player::player_structs::PlayerGraphics;
-use crate::core_game::player::player_structs::PlayerInput;
-use crate::core_game::player::player_structs::PlayerMoveState;
-use crate::core_game::player::player_structs::PlayerState;
-use crate::core_game::player::player_structs::PlayerStateVariables;
-use crate::core_game::player::player_structs::PlayerWeaponMelee;
-use crate::core_game::player::player_structs::PlayerWeaponRanged;
-use crate::core_game::player::player_structs::PlayerWeapons;
-use crate::core_game::player::player_structs::RandomValues;
-use crate::core_game::player::player_structs::StealthMode;
-use crate::core_game::player::player_structs::TimeDivisions;
-use crate::core_game::player::player_structs::Vel;
-use crate::core_game::player::player_structs::WallKick;
+use crate::core_game::animation::{AnimationState, Facing};
 
-use super::player_structs::SoundParams;
+use super::player_structs::{
+	Ability, AnimationParams, DamageKind, Grav, MoveSpeed, MyPlayerAnimations, MyPlayerSounds,
+	Player, PlayerAbilities, PlayerAnimationState, PlayerAttackState, PlayerCasts, PlayerDamage,
+	PlayerDamageStats, PlayerDirectionState, PlayerGraphics, PlayerInput, PlayerMoveState,
+	PlayerState, PlayerStateVariables, PlayerWeaponMelee, PlayerWeaponRanged, PlayerWeapons,
+	RandomValues, SoundParams, StealthMode, TimeDivisions, Vel, WallKick,
+};
+
+// use super::player_structs::*;
 
 pub fn setup_player(
 	mut commands: Commands,
@@ -136,6 +117,7 @@ pub fn setup_player(
 						PlayerAttackState::None,
 					),
 				},
+				Facing::Left,
 				PlayerDamage {
 					dealt: false,
 					applied: false,
@@ -194,20 +176,6 @@ pub fn setup_player(
 				fourteen: 0,
 				fifteen: 0,
 				reset: false,
-			},
-			RandomValues {
-				one: 0,
-				two: 0,
-				three: 0,
-				four: 0,
-				five: 0,
-				six: 0,
-				seven: 0,
-				eight: 0,
-				nine: 0,
-				ten: 0,
-				eleven: 0,
-				twelve: 0,
 			},
 			RigidBody::KinematicPositionBased,
 			Collider::cuboid(2.0, 5.0),
@@ -723,6 +691,7 @@ pub fn setup_player(
 				visibility: Visibility { is_visible: true },
 				..Default::default()
 			},
+			AnimationState::default(),
 			PlayerGraphics,
 			SoundParams {
 				handle: ice_impact_1.clone(),

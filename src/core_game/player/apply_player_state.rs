@@ -57,18 +57,18 @@ pub fn apply_player_state(
 
 			//FLIP SPRITE
 
-			if state.new.1 == PlayerDirectionState::Right {
-				sprite.flip_x = false;
-			}
-			if state.new.1 == PlayerDirectionState::Left {
-				sprite.flip_x = true;
-			}
-
-			if sprite.flip_x == false {
-				looking_direction = 1.0;
-			} else {
-				looking_direction = -1.0;
-			}
+			// if state.new.1 == PlayerDirectionState::Right {
+			// 	sprite.flip_x = false;
+			// }
+			// if state.new.1 == PlayerDirectionState::Left {
+			// 	sprite.flip_x = true;
+			// }
+			//
+			// if sprite.flip_x == false {
+			// 	looking_direction = 1.0;
+			// } else {
+			// 	looking_direction = -1.0;
+			// }
 
 			// STEALTH MODE
 
