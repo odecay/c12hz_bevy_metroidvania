@@ -70,7 +70,7 @@ pub fn movement_and_collisions(
 		// the code below rounds up the player transform to multiples of 0.125 (game scale unit) whenever it is safe to do so.
 		//this ensures there are no ugly long decimal points in the player transform whenever possible
 
-		if collided == false
+		if !collided
 			&& (state.new.movement == PlayerMoveState::Idle
 				|| state.new.movement == PlayerMoveState::Run
 				|| state.new.movement == PlayerMoveState::Whirlwind)
@@ -110,7 +110,7 @@ pub fn movement_and_collisions(
 			}
 		}
 
-		if collided == false {
+		if !collided {
 			let hit3 = rapier_context.cast_shape(
 				transform.translation.truncate(),
 				0.0,
@@ -128,6 +128,6 @@ pub fn movement_and_collisions(
 			}
 		}
 
-		if collided == true {}
+		if collided {}
 	}
 }

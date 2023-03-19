@@ -1,4 +1,4 @@
-use std::time::Duration;
+
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
@@ -30,10 +30,10 @@ pub fn periodic_spawn(
 	asset_server: Res<AssetServer>,
 	mut commands: Commands,
 	mut query_spawnpoint: Query<&mut CreatureSpawnPoint>,
-	mut query_player: Query<&Transform, With<Player>>,
+	query_player: Query<&Transform, With<Player>>,
 	mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 	query_creature: Query<Entity, With<Creature>>,
-	query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
+	_query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
 ) {
 	for mut spawnpoint in query_spawnpoint.iter_mut() {
 		for player_transform in query_player.iter() {

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+
 
 /// Marker that goes on the creature main entity
 #[derive(Component)]

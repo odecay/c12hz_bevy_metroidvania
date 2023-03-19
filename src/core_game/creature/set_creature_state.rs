@@ -24,7 +24,7 @@ pub fn set_creature_state(
 	>,
 	query_player: Query<(&Transform, &StealthMode, &PlayerCasts), With<Player>>,
 ) {
-	for (e, transform, mut state, mut var, cast) in query.iter_mut() {
+	for (_e, transform, mut state, mut var, cast) in query.iter_mut() {
 		let mut rng = thread_rng();
 		var.isolated = true;
 

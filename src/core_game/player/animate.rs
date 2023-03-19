@@ -25,7 +25,7 @@ pub fn animate(
 
 		// perfect_transitions means game wait till current frame finishes before moving to next animation
 
-		if params.perfect_transitions == true {
+		if params.perfect_transitions {
 			if time.five == 1 {
 				if params.atlas == *handle {
 					sprite.index += 1;
@@ -38,7 +38,7 @@ pub fn animate(
 					sprite.index = params.start;
 				}
 			}
-		} else if params.perfect_transitions == false {
+		} else if !params.perfect_transitions {
 			if params.atlas == *handle {
 				if time.five == 1 {
 					sprite.index += 1;

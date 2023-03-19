@@ -37,7 +37,7 @@ pub fn set_move_state(
 		With<Player>,
 	>
 ) {
-	for (transform, damage, mut state, mut var, mut stealth, input, cast, mut facing) in
+	for (_transform, damage, mut state, mut var, mut stealth, input, cast, mut facing) in
 		query.iter_mut()
 	{
 		// INITIATE VARIABLES
@@ -46,7 +46,7 @@ pub fn set_move_state(
 		let stealth_mode = false;
 		let whirl = false;
 		let mut move_direction = 0.0;
-		let raycast = 0.0101;
+		let _raycast = 0.0101;
 		let max_jumps = 2;
 		let max_jump_duration = 24;
 
@@ -79,27 +79,19 @@ pub fn set_move_state(
 			&& !move_right
 			&& !jump_start
 			&& var.dash_counter == 0
-			&& var.dash_strike_counter == 0
-			&& !whirl
-		{
-			if cast.basic_down {
-				state.old.movement = state.new.movement;
-				state.new.movement = PlayerMoveState::Idle;
-				var.jumps_remaining = max_jumps;
-				var.jump_frame_counter = 0;
-			}
-		}
+			&& var.dash_strike_counter == 0 && !whirl && cast.basic_down {
+  				state.old.movement = state.new.movement;
+  				state.new.movement = PlayerMoveState::Idle;
+  				var.jumps_remaining = max_jumps;
+  				var.jump_frame_counter = 0;
+  			}
 
 		// RUN MOVE STATE
-		if move_left
-			|| move_right && !jump_start && var.dash_counter == 0 && var.dash_strike_counter == 0
-		{
-			if cast.basic_down {
-				state.old.movement = state.new.movement;
-				state.new.movement = PlayerMoveState::Run;
-				var.jumps_remaining = max_jumps;
-			}
-		}
+		if (move_left || move_right && !jump_start && var.dash_counter == 0 && var.dash_strike_counter == 0) && cast.basic_down {
+  				state.old.movement = state.new.movement;
+  				state.new.movement = PlayerMoveState::Run;
+  				var.jumps_remaining = max_jumps;
+  			}
 
 		// JUMP MOVE STATE
 		if jump_pressed && var.jumps_remaining > 0 && var.jump_frame_counter <= max_jump_duration {
@@ -111,16 +103,12 @@ pub fn set_move_state(
 				var.jump_frame_counter = 100;
 			}
 		}
-		if jump_pressed == false {
+		if !jump_pressed {
 			var.jump_frame_counter = 0;
 		}
-		if state.new.movement == PlayerMoveState::Fall
-			&& state.old.movement == PlayerMoveState::Jump
-		{
-			if var.jumps_remaining > 0 {
-				var.jumps_remaining -= 1;
-			}
-		}
+		if state.new.movement == PlayerMoveState::Fall && state.old.movement == PlayerMoveState::Jump && var.jumps_remaining > 0 {
+  				var.jumps_remaining -= 1;
+  			}
 
 		// FALL MOVE STATE
 		if !jump_pressed || var.jump_frame_counter >= max_jump_duration {
@@ -132,15 +120,13 @@ pub fn set_move_state(
 				state.old.movement = state.new.movement;
 				state.new.movement = PlayerMoveState::Fall;
 			}
-		} else {
-			if cast.basic_up
-				&& !cast.directional_x
-				&& var.dash_counter == 0
-				&& var.dash_strike_counter == 0
-			{
-				state.new.movement = PlayerMoveState::Fall;
-			}
-		}
+		} else if cast.basic_up
+  				&& !cast.directional_x
+  				&& var.dash_counter == 0
+  				&& var.dash_strike_counter == 0
+  			{
+  				state.new.movement = PlayerMoveState::Fall;
+  			}
 
 		// WALL SLIDE MOVE STATE
 		if (!jump_pressed || var.jump_frame_counter >= max_jump_duration)
@@ -152,18 +138,16 @@ pub fn set_move_state(
 					state.new.movement = PlayerMoveState::WallSlide;
 					var.jumps_remaining = max_jumps;
 				};
-			} else {
-				if cast.basic_up
-					&& cast.directional_x
-					&& var.dash_counter == 0
-					&& var.dash_strike_counter == 0
-				{
-					state.old.movement = state.new.movement;
-					state.new.movement = PlayerMoveState::WallSlide;
-					var.jumps_remaining = max_jumps;
-					var.walljump_counter = 0;
-				}
-			}
+			} else if cast.basic_up
+   					&& cast.directional_x
+   					&& var.dash_counter == 0
+   					&& var.dash_strike_counter == 0
+   				{
+   					state.old.movement = state.new.movement;
+   					state.new.movement = PlayerMoveState::WallSlide;
+   					var.jumps_remaining = max_jumps;
+   					var.walljump_counter = 0;
+   				}
 		}
 		if state.new.movement == PlayerMoveState::Jump
 			&& state.old.movement == PlayerMoveState::WallSlide

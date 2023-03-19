@@ -157,8 +157,8 @@ pub fn player_deal_damage(
 				let mut targets_right = Vec::new();
 				let mut targets_left = Vec::new();
 				if sprite.index == 1 || sprite.index == 3 {
-					if (sprite.index == 1 && sprite.flip_x == false)
-						|| (sprite.index == 3 && sprite.flip_x == true)
+					if (sprite.index == 1 && !sprite.flip_x)
+						|| (sprite.index == 3 && sprite.flip_x)
 					{
 						loop {
 							let hit_whirl_right = rapier_context.cast_shape(
@@ -188,8 +188,8 @@ pub fn player_deal_damage(
 						damage.direction = 1.0;
 					}
 
-					if (sprite.index == 1 && sprite.flip_x == true)
-						|| (sprite.index == 3 && sprite.flip_x == false)
+					if (sprite.index == 1 && sprite.flip_x)
+						|| (sprite.index == 3 && !sprite.flip_x)
 					{
 						loop {
 							let hit_whirl_left = rapier_context.cast_shape(
@@ -236,7 +236,7 @@ pub fn player_deal_damage(
 			}
 
 			// IF DAMAGE HIT TARGET SET DAMAGE.APPLIED TO TRUE
-			if damage.targets.len() > 0 && damage.dealt {
+			if !damage.targets.is_empty() && damage.dealt {
 				damage.applied = true;
 			} else {
 				damage.applied = false;

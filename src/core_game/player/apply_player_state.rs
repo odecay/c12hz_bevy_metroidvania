@@ -44,7 +44,7 @@ pub fn apply_player_state(
 	>,
 	mut query2: Query<&mut TextureAtlasSprite, With<PlayerGraphics>>,
 ) {
-	let mut looking_direction: f32 = 0.0;
+	let looking_direction: f32 = 0.0;
 
 	for (state, var, speed, mut velocity, mut gravity, mut wall_kick, stealth, input) in
 		query.iter_mut()
@@ -412,24 +412,19 @@ pub fn apply_player_state(
 			}
 			// ACTIVE COLLISION WITH VERTICAL WALL
 			// this removes ugly numbers from shapecast collision calculations
-			if var.actively_colliding == true {
-				if wall_kick.timer == 0 {
-					velocity.x = 0.0;
-				}
-			}
+			if var.actively_colliding && wall_kick.timer == 0 {
+   					velocity.x = 0.0;
+   				}
 
 			// ADD "FRICTION" BETWEEN PLAYER AND ENEMIES
-			if var.penetrating_enemy {
-				if !(state.new.movement == PlayerMoveState::DashForward
-					|| state.new.movement == PlayerMoveState::DashDown45)
-				{
-					if state.new.attack == PlayerAttackState::None {
-						velocity.x = ((velocity.x / 1.5) * 8.0).round() / 8.0;
-					} else {
-						velocity.x = 0.0;
-					}
-				}
-			}
+			if var.penetrating_enemy && !(state.new.movement == PlayerMoveState::DashForward
+					|| state.new.movement == PlayerMoveState::DashDown45) {
+   					if state.new.attack == PlayerAttackState::None {
+   						velocity.x = ((velocity.x / 1.5) * 8.0).round() / 8.0;
+   					} else {
+   						velocity.x = 0.0;
+   					}
+   				}
 		}
 	}
 }

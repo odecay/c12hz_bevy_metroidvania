@@ -42,13 +42,13 @@ pub fn move_camera(
 				&& (cast.big_left || cast.big_right)
 				&& var.walljump_counter > 0;
 
-			if var.sprite_flipped == false && is_wall_jumping == false {
+			if !var.sprite_flipped && !is_wall_jumping {
 				camera_transform.translation.x = camera_transform.translation.x
 					+ ((player_x + horizontal_offset) - camera_transform.translation.x) * scalar_x;
 				camera_transform.translation.z = player_transform.translation.z;
 			}
 
-			if var.sprite_flipped == true && is_wall_jumping == false {
+			if var.sprite_flipped && !is_wall_jumping {
 				camera_transform.translation.x = camera_transform.translation.x
 					+ ((player_x - horizontal_offset) - camera_transform.translation.x) * scalar_x;
 				camera_transform.translation.z = player_transform.translation.z;

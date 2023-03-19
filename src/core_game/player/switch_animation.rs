@@ -79,7 +79,7 @@ pub fn switch_animation(
 						*clock = !*clock;
 					}
 
-					if *clock == true {
+					if *clock {
 						commands.entity(e).insert(anims.mbs1.clone());
 					} else {
 						commands.entity(e).insert(anims.mbs2.clone());
@@ -91,7 +91,7 @@ pub fn switch_animation(
 						*clock = !*clock;
 					}
 
-					if *clock == true {
+					if *clock {
 						commands.entity(e).insert(anims.mbh1.clone());
 					} else {
 						commands.entity(e).insert(anims.mbh2.clone());
@@ -111,7 +111,7 @@ pub fn switch_animation(
 						*clock = !*clock;
 					}
 
-					if *clock == true {
+					if *clock {
 						commands.entity(e).insert(anims.rbgf1.clone());
 					} else {
 						commands.entity(e).insert(anims.rbgf2.clone());
@@ -123,7 +123,7 @@ pub fn switch_animation(
 						*clock = !*clock;
 					}
 
-					if *clock == true {
+					if *clock {
 						commands.entity(e).insert(anims.rbgu1.clone());
 					} else {
 						commands.entity(e).insert(anims.rbgu2.clone());

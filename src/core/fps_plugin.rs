@@ -85,7 +85,7 @@ fn fps_enabler(
 	frame_counter_state: Res<CurrentState<FrameCounterState>>,
 	keys: Res<Input<KeyCode>>,
 ) {
-	if keys.just_pressed(KeyCode::F5) == false {
+	if !keys.just_pressed(KeyCode::F5) {
 		return;
 	}
 

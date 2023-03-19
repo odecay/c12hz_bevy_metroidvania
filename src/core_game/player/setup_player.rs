@@ -6,10 +6,10 @@ use crate::core_game::animation::{AnimationState, Facing};
 
 use super::player_structs::{
 	Ability, AnimationParams, DamageKind, Grav, MoveSpeed, MyPlayerAnimations, MyPlayerSounds,
-	Player, PlayerAbilities, PlayerAnimationState, PlayerAttackState, PlayerCasts, PlayerDamage,
-	PlayerDamageStats, PlayerDirectionState, PlayerGraphics, PlayerInput, PlayerMoveState,
+	Player, PlayerAbilities, PlayerCasts, PlayerDamage,
+	PlayerDamageStats, PlayerGraphics, PlayerInput,
 	PlayerState, PlayerStateBuffer, PlayerStateVariables, PlayerWeaponMelee, PlayerWeaponRanged,
-	PlayerWeapons, RandomValues, SoundParams, StealthMode, TimeDivisions, Vel, WallKick,
+	PlayerWeapons, SoundParams, StealthMode, TimeDivisions, Vel, WallKick,
 };
 
 // use super::player_structs::*;
@@ -20,7 +20,7 @@ pub fn setup_player(
 	mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 	query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
 ) {
-	for (e, ldtk_entity_info) in query.iter() {
+	for (_e, ldtk_entity_info) in query.iter() {
 		if ldtk_entity_info.identifier != "Player" {
 			continue;
 		}

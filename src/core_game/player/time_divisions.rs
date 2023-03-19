@@ -20,7 +20,7 @@ pub fn time_divisions(
 		for mut time in query2.iter_mut() {
 			time.reset = params.atlas != *handle; // resets the timer when animation changes
 
-			if time.reset == true {
+			if time.reset {
 				time.two = 0;
 				time.three = 0;
 				time.four = 0;

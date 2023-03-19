@@ -8,7 +8,7 @@ pub fn setup_creature(
 	mut commands: Commands,
 	query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
 ) {
-	for (e, ldtk_entity_info) in query.iter() {
+	for (_e, ldtk_entity_info) in query.iter() {
 		if ldtk_entity_info.identifier != "Creature1" {
 			continue;
 		}
@@ -20,7 +20,7 @@ pub fn setup_creature(
 		);
 
 		// SET UP PHYSICS ENTITY
-		let spawn_point = commands
+		let _spawn_point = commands
 			.spawn(CreatureSpawnPoint {
 				current: None,
 				timer: Timer::new(Duration::from_secs(1), TimerMode::Once),

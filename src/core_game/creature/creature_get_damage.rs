@@ -14,7 +14,7 @@ use crate::core_game::creature::creature_structs::CreatureStats;
 use super::creature_structs::CreatureMoveState;
 
 pub fn creature_get_damage(
-	player: Query<(&PlayerDamage), With<Player>>,
+	player: Query<&PlayerDamage, With<Player>>,
 	mut creature: Query<
 		(
 			&CreatureGraphicsEntity,
@@ -24,7 +24,7 @@ pub fn creature_get_damage(
 		),
 		With<Creature>,
 	>,
-	mut creature_graphics: Query<(&mut TextureAtlasSprite), With<CreatureGraphics>>,
+	mut creature_graphics: Query<&mut TextureAtlasSprite, With<CreatureGraphics>>,
 	mut timer: Local<u32>,
 	mut pushback_timer: Local<u32>,
 ) {
@@ -49,11 +49,9 @@ pub fn creature_get_damage(
 				}
 
 				if *pushback_timer > 0 {
-					if rng.gen_range(0..9) > 6 {
-						if state.new.0 != CreatureMoveState::Defence {
-							transform.translation.x += pushback_velocity * damage.direction;
-						}
-					}
+					if rng.gen_range(0..9) > 6 && state.new.0 != CreatureMoveState::Defence {
+     							transform.translation.x += pushback_velocity * damage.direction;
+     						}
 					*pushback_timer -= 1;
 				}
 

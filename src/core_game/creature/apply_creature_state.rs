@@ -32,7 +32,7 @@ pub fn apply_creature_state(
 	mut query2: Query<&mut TextureAtlasSprite, With<CreatureGraphics>>,
 	mut query_player: Query<&Transform, With<Player>>,
 	mut reset_velocity: Local<bool>,
-	mut chase_delay: Local<u32>,
+	_chase_delay: Local<u32>,
 ) {
 	for (mut othervar, transform, mut velocity, speed, state, var, cg, cast) in query.iter_mut() {
 		if let Ok(mut sprite) = query2.get_mut(cg.0) {
@@ -73,24 +73,18 @@ pub fn apply_creature_state(
 					{
 						*reset_velocity = true;
 					}
-					if *reset_velocity == true {
-						if sprite.flip_x == true {
+					if *reset_velocity {
+						if sprite.flip_x {
 							velocity.x = speed.x;
 						}
-						if sprite.flip_x == false {
+						if !sprite.flip_x {
 							velocity.x = -speed.x;
 						}
 					}
 					//random direction switching
-					if state.new.0 == CreatureMoveState::Patrol
-						&& state.old.0 != CreatureMoveState::Patrol
-					{
-						if cast.down_left && cast.down_right {
-							if rng.gen_range(0..9) > 4 {
-								velocity.x = velocity.x * -1.0;
-							}
-						}
-					}
+					if state.new.0 == CreatureMoveState::Patrol && state.old.0 != CreatureMoveState::Patrol && cast.down_left && cast.down_right && rng.gen_range(0..9) > 4 {
+     								velocity.x *= -1.0;
+     							}
 				}
 
 				// IDLE

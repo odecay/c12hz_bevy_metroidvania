@@ -24,7 +24,7 @@ pub fn animate_creature(
 
 		// perfect_transitions means game wait till current frame finishes before moving to next animation
 
-		if params.perfect_transitions == true {
+		if params.perfect_transitions {
 			if time.five == 1 {
 				if params.atlas == *handle {
 					sprite.index += 1;
@@ -41,19 +41,17 @@ pub fn animate_creature(
 					sprite.index = params.start;
 				}
 			}
-		} else if params.perfect_transitions == false {
-			if params.atlas == *handle {
-				if time.five == 1 {
-					sprite.index += 1;
-					if sprite.index >= params.end {
-						if params.looping {
-							sprite.index = params.restart;
-						} else {
-							sprite.index = params.end - 1;
-						}
-					}
-				}
-			}
+		} else if !params.perfect_transitions {
+			if params.atlas == *handle && time.five == 1 {
+   					sprite.index += 1;
+   					if sprite.index >= params.end {
+   						if params.looping {
+   							sprite.index = params.restart;
+   						} else {
+   							sprite.index = params.end - 1;
+   						}
+   					}
+   				}
 			if params.atlas != *handle {
 				// we need to change to a different animation
 				*handle = params.atlas.clone();

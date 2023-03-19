@@ -17,12 +17,12 @@ pub fn transfer_data(
 			trans.translation = (transform.translation * 8.0).round() / 8.0;
 
 			//the function below offsets the graphic entity's vertical position so that the head goes slightly above the collider box
-			trans.translation.y = trans.translation.y + 3.0;
+			trans.translation.y += 3.0;
 			if sprite.index == 3 {
-				trans.translation.y = trans.translation.y + 0.25;
+				trans.translation.y += 0.25;
 			}
 			if sprite.index == 4 || sprite.index == 6 {
-				trans.translation.y = trans.translation.y + 0.125;
+				trans.translation.y += 0.125;
 			}
 		}
 	}

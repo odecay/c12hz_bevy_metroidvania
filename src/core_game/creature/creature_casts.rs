@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_rapier2d::{
-	prelude::{Collider, InteractionGroups, QueryFilter, RapierContext, TOIStatus},
+	prelude::{Collider, InteractionGroups, QueryFilter, RapierContext},
 	rapier::prelude::Group,
 };
 use rand::{thread_rng, Rng};
@@ -9,7 +9,7 @@ use crate::core_game::creature::creature_structs::Creature;
 use crate::core_game::creature::creature_structs::CreatureCasts;
 use crate::core_game::creature::creature_structs::MoveSpeed;
 
-use super::creature_structs::CreatureStateVariables;
+
 
 pub fn creature_casts(
 	mut query: Query<(&Collider, &Transform, &MoveSpeed, &mut CreatureCasts), With<Creature>>,
