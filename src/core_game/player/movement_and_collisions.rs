@@ -1,8 +1,7 @@
 use crate::core_game::player::player_structs::Vel;
 use bevy::prelude::*;
-use bevy_rapier2d::{
-	prelude::{Collider, InteractionGroups, QueryFilter, RapierContext, TOIStatus},
-	rapier::prelude::Group,
+use bevy_rapier2d::prelude::{
+	Collider, CollisionGroups, Group, QueryFilter, RapierContext, TOIStatus,
 };
 
 use crate::core_game::player::player_structs::Player;
@@ -43,7 +42,7 @@ pub fn movement_and_collisions(
 					exclude_rigid_body: Some(entity),
 					..QueryFilter::default()
 				}
-				.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+				.groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 			);
 
 			if let Some((_collision, toi)) = hit {
@@ -84,8 +83,7 @@ pub fn movement_and_collisions(
 				) * 1.5,
 				collider,
 				1.0,
-				QueryFilter::default()
-					.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+				QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 			);
 			if hit1.is_none() {
 
@@ -101,8 +99,7 @@ pub fn movement_and_collisions(
 				) * 1.5,
 				collider,
 				1.0,
-				QueryFilter::default()
-					.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+				QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 			);
 			if hit2.is_none() {
 
@@ -119,8 +116,7 @@ pub fn movement_and_collisions(
 					* 3.0,
 				collider,
 				1.0,
-				QueryFilter::default()
-					.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+				QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 			);
 			if hit3.is_none() {
 

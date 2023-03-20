@@ -2,14 +2,15 @@ use bevy::{
 	diagnostic::{Diagnostics, FrameTimeDiagnosticsPlugin},
 	prelude::*,
 };
-use iyes_loopless::prelude::*;
+// use iyes_loopless::prelude::*;
 
 #[derive(Component)]
 pub struct FrameCounterTag;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, States)]
 pub(crate) enum FrameCounterState {
 	Enabled,
+	#[default]
 	Disabled,
 }
 
@@ -21,10 +22,14 @@ impl Plugin for FPSPlugin {
 		app: &mut App,
 	) {
 		app.add_plugin(FrameTimeDiagnosticsPlugin)
-			.add_loopless_state(FrameCounterState::Disabled)
-			.add_enter_system(FrameCounterState::Enabled, create_fps_counter)
-			.add_exit_system(FrameCounterState::Enabled, remove_fps_counter)
-			.add_system(fps_counter_system.run_in_state(FrameCounterState::Enabled))
+			.add_state::<FrameCounterState>()
+			// .add_loopless_state(FrameCounterState::Disabled)
+			.add_system(create_fps_counter.in_schedule(OnEnter(FrameCounterState::Enabled)))
+			// .add_enter_system(FrameCounterState::Enabled, create_fps_counter)
+			// .add_exit_system(FrameCounterState::Enabled, remove_fps_counter)
+			.add_system(remove_fps_counter.in_schedule(OnExit(FrameCounterState::Enabled)))
+			// .add_system(fps_counter_system.run_in_state(FrameCounterState::Enabled))
+			.add_system(fps_counter_system.in_set(OnUpdate(FrameCounterState::Enabled)))
 			.add_system(fps_enabler);
 	}
 }
@@ -81,8 +86,9 @@ fn fps_counter_system(
 }
 
 fn fps_enabler(
-	mut commands: Commands,
-	frame_counter_state: Res<CurrentState<FrameCounterState>>,
+	// mut commands: Commands,
+	frame_counter_state: Res<State<FrameCounterState>>,
+	mut next_state: ResMut<NextState<FrameCounterState>>,
 	keys: Res<Input<KeyCode>>,
 ) {
 	if !keys.just_pressed(KeyCode::F5) {
@@ -95,7 +101,9 @@ fn fps_enabler(
 		FrameCounterState::Enabled
 	};
 
-	commands.insert_resource(NextState(new_state));
+	next_state.set(new_state);
+
+	// commands.insert_resource(NextState(new_state));
 }
 
 fn extract_fps(diagnostics: &Res<Diagnostics>) -> Option<f64> {

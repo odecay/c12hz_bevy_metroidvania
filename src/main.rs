@@ -1,11 +1,13 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
+use bevy_ecs_ldtk::{LdtkPlugin, LdtkSystemSet};
 use bevy_rapier2d::prelude::*;
-use iyes_loopless::prelude::*;
+// use iyes_loopless::prelude::*;
 //use std::time::Duration;
 use bevy::window::PresentMode;
-use bevy_inspector_egui::{RegisterInspectable, WorldInspectorPlugin};
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
+// use bevy_inspector_egui::{RegisterInspectable, WorldInspectorPlugin};
 
 mod core;
 mod core_game;
@@ -51,33 +53,36 @@ use crate::creature::creature_death::*;
 
 fn main() {
 	App::new()
-		.insert_resource(Msaa { samples: 1 })
+		.insert_resource(Msaa::Off)
 		.add_plugins(
 			DefaultPlugins
 				.set(WindowPlugin {
-					window: WindowDescriptor {
+					primary_window: Some(Window {
 						present_mode: PresentMode::Fifo,
 						title: core::GAME_NAME.to_string(),
 						resizable: true,
-						width: 1920.0,
-						height: 1080.0,
-						..Default::default()
-					},
+						resolution: (1920., 1080.).into(),
+						..default()
+					}),
 					..Default::default()
 				})
 				.set(ImagePlugin::default_nearest()),
 		)
-		.add_fixed_timestep(Duration::from_nanos(16666667), "my_fixed")
+		//animation should probably not be in fixed timestep
+		.insert_resource(FixedTime::new(Duration::from_nanos(16666667)))
+		// .add_fixed_timestep(Duration::from_nanos(16666667), "my_fixed")
+		.add_plugin(LdtkPlugin)
 		.add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
-		//.add_plugin(RapierDebugRenderPlugin::default())
+		.configure_set(LdtkSystemSet::ProcessApi.before(PhysicsSet::SyncBackend))
+		.add_plugin(RapierDebugRenderPlugin::default())
 		.add_plugin(core::setup::SetupPlugin)
 		.add_plugin(core_game::world::WorldPlugin)
 		.add_plugin(core_game::player::PlayerPlugin)
 		.add_plugin(core_game::creature::CreaturePlugin)
 		.add_plugin(core_game::animation::AnimationPlugin)
 		.add_plugin(WorldInspectorPlugin::new())
-		.register_inspectable::<core_game::player::player_structs::PlayerAbilities>()
-		.register_inspectable::<core_game::player::player_structs::PlayerWeapons>()
+		// .register_inspectable::<core_game::player::player_structs::PlayerAbilities>()
+		// .register_inspectable::<core_game::player::player_structs::PlayerWeapons>()
 		.run();
 }
 

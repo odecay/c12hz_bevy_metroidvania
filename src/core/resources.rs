@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-use iyes_loopless::prelude::*;
+// use iyes_loopless::prelude::*;
 
-use crate::core::states;
+use crate::core::states::AppState;
 
 pub struct ResourcePlugin;
 
@@ -16,8 +16,8 @@ impl Plugin for ResourcePlugin {
 }
 
 pub fn create_resources(
-	mut commands: Commands,
+	mut state: ResMut<NextState<AppState>>,
 	_asset_server: Res<AssetServer>,
 ) {
-	commands.insert_resource(NextState(states::AppState::Loaded));
+	state.set(AppState::Loaded);
 }

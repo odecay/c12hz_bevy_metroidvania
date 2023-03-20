@@ -1,8 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier2d::{
-	prelude::{Collider, InteractionGroups, QueryFilter, RapierContext},
-	rapier::prelude::Group,
-};
+use bevy_rapier2d::prelude::{Collider, CollisionGroups, Group, QueryFilter, RapierContext};
 
 use crate::core_game::player::player_structs::Player;
 use crate::core_game::player::player_structs::PlayerCasts;
@@ -47,7 +44,7 @@ pub fn player_casts(
 			Vec2::new(0.0, raycast),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 		);
 		if hit_up.is_some() {
 			cast.basic_up = true;
@@ -60,7 +57,7 @@ pub fn player_casts(
 			Vec2::new(0.0, -raycast),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 		);
 		if hit_down.is_some() {
 			cast.basic_down = true;
@@ -73,7 +70,7 @@ pub fn player_casts(
 			Vec2::new(-raycast, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 		);
 		if hit_left.is_some() {
 			cast.basic_left = true;
@@ -86,7 +83,7 @@ pub fn player_casts(
 			Vec2::new(raycast, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 		);
 		if hit_right.is_some() {
 			cast.basic_right = true;
@@ -100,8 +97,7 @@ pub fn player_casts(
 				Vec2::new(raycast * move_direction, 0.0),
 				collider,
 				1.0,
-				QueryFilter::default()
-					.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+				QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 			);
 			if hit_dir_x.is_some() {
 				cast.directional_x = true;
@@ -115,7 +111,7 @@ pub fn player_casts(
 			Vec2::new(-big_raycast, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 		);
 		if hit_big_left.is_some() {
 			cast.big_left = true;
@@ -128,7 +124,7 @@ pub fn player_casts(
 			Vec2::new(big_raycast, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 		);
 		if hit_big_right.is_some() {
 			cast.big_right = true;
@@ -141,7 +137,7 @@ pub fn player_casts(
 			Vec2::new(move_direction, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 		);
 		if hit_ws_up.is_some() {
 			cast.wallslide_anim_up = true;
@@ -154,7 +150,7 @@ pub fn player_casts(
 			Vec2::new(move_direction, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1)),
 		);
 		if hit_ws_down.is_some() {
 			cast.wallslide_anim_down = true;
@@ -167,7 +163,7 @@ pub fn player_casts(
 			Vec2::new(0.0, 0.01),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_3)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_3)),
 		);
 		if hit_enemy.is_some() {
 			cast.enemy_penetration = true;
@@ -183,7 +179,7 @@ pub fn player_casts(
 				collider,
 				1.0,
 				QueryFilter::default()
-					.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_3))
+					.groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_3))
 					.predicate(&|e| !targets.iter().any(|t| *t == e)),
 			);
 			let hit_right = rapier_context.cast_shape(
@@ -193,7 +189,7 @@ pub fn player_casts(
 				collider,
 				1.0,
 				QueryFilter::default()
-					.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_3))
+					.groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_3))
 					.predicate(&|e| !targets.iter().any(|t| *t == e)),
 			);
 			if let Some((entity, _toii)) = hit_left {

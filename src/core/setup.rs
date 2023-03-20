@@ -1,8 +1,10 @@
 use bevy::prelude::*;
 
-use iyes_loopless::prelude::*;
+// use iyes_loopless::prelude::*;
 
 use crate::core::*;
+
+use super::states::AppState;
 
 /*
 	resources used:
@@ -17,7 +19,8 @@ impl Plugin for SetupPlugin {
 		&self,
 		app: &mut App,
 	) {
-		app.add_loopless_state(states::AppState::Loading)
+		app.add_state::<AppState>()
+			// app.add_loopless_state(states::AppState::Loading)
 			.add_plugin(fps_plugin::FPSPlugin);
 	}
 }

@@ -1,15 +1,10 @@
 use bevy::prelude::*;
-use bevy_rapier2d::{
-	prelude::{Collider, InteractionGroups, QueryFilter, RapierContext},
-	rapier::prelude::Group,
-};
+use bevy_rapier2d::prelude::{Collider, CollisionGroups, Group, QueryFilter, RapierContext};
 use rand::{thread_rng, Rng};
 
 use crate::core_game::creature::creature_structs::Creature;
 use crate::core_game::creature::creature_structs::CreatureCasts;
 use crate::core_game::creature::creature_structs::MoveSpeed;
-
-
 
 pub fn creature_casts(
 	mut query: Query<(&Collider, &Transform, &MoveSpeed, &mut CreatureCasts), With<Creature>>,
@@ -44,7 +39,7 @@ pub fn creature_casts(
 			Vec2::new(2.0 * sight_range, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_3, Group::GROUP_2)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_3, Group::GROUP_2)),
 		);
 		if sight_sensor.is_some() {
 			cast.sight_new = true;
@@ -61,7 +56,7 @@ pub fn creature_casts(
 			Vec2::new(2.0 * (attack_range + cast.attack_offset), 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_3, Group::GROUP_2)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_3, Group::GROUP_2)),
 		);
 		if attack_sensor.is_some() {
 			cast.attack_range = true;
@@ -74,7 +69,7 @@ pub fn creature_casts(
 			Vec2::new(2.0 * chase_range, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_3, Group::GROUP_2)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_3, Group::GROUP_2)),
 		);
 		if chase_sensor.is_some() {
 			cast.chase_range = true;
@@ -87,7 +82,7 @@ pub fn creature_casts(
 			Vec2::new(2.0 * help_range, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_3, Group::GROUP_2)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_3, Group::GROUP_2)),
 		);
 		if help_sensor.is_some() {
 			cast.help_range = true;
@@ -100,7 +95,7 @@ pub fn creature_casts(
 			Vec2::new(2.0 * retreat_range, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_3, Group::GROUP_2)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_3, Group::GROUP_2)),
 		);
 		if retreat_sensor.is_some() {
 			cast.retreat_range = true;
@@ -113,7 +108,7 @@ pub fn creature_casts(
 			Vec2::new(2.0 * defence_range, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_3, Group::GROUP_2)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_3, Group::GROUP_2)),
 		);
 		if defence_sensor.is_some() {
 			cast.defence_range = true;
@@ -126,7 +121,7 @@ pub fn creature_casts(
 			Vec2::new(0.0, -1.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_3, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_3, Group::GROUP_1)),
 		);
 		if hit_down_right.is_some() {
 			cast.down_right = true;
@@ -139,7 +134,7 @@ pub fn creature_casts(
 			Vec2::new(0.0, -1.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_3, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_3, Group::GROUP_1)),
 		);
 		if hit_down_left.is_some() {
 			cast.down_left = true;
@@ -152,7 +147,7 @@ pub fn creature_casts(
 			Vec2::new(speed.x * 3.0, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_3, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_3, Group::GROUP_1)),
 		);
 		if collision_right.is_some() {
 			cast.basic_right = true;
@@ -165,7 +160,7 @@ pub fn creature_casts(
 			Vec2::new(-speed.x * 3.0, 0.0),
 			collider,
 			1.0,
-			QueryFilter::default().groups(InteractionGroups::new(Group::GROUP_3, Group::GROUP_1)),
+			QueryFilter::default().groups(CollisionGroups::new(Group::GROUP_3, Group::GROUP_1)),
 		);
 		if collision_left.is_some() {
 			cast.basic_left = true;

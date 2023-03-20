@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::Inspectable;
 
 #[derive(Component)]
 pub struct Player;
@@ -198,7 +197,7 @@ pub enum DamageKind {
 	DashStrike,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Reflect, Inspectable)]
+#[derive(Debug, Clone, Copy, PartialEq, Reflect)]
 pub enum PassiveSkills {
 	Adrenaline,
 	Endorphin,
@@ -209,27 +208,27 @@ pub enum PassiveSkills {
 	Surprise,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Reflect, Inspectable)]
+#[derive(Debug, Clone, Copy, PartialEq, Reflect)]
 pub enum PlayerWeaponMelee {
 	Hammer,
 	Sword,
 	None,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Reflect, Inspectable)]
+#[derive(Debug, Clone, Copy, PartialEq, Reflect)]
 pub enum PlayerWeaponRanged {
 	Bow,
 	Guns,
 	None,
 }
 
-#[derive(Component, Debug, Clone, Copy, PartialEq, Reflect, Inspectable)]
+#[derive(Component, Debug, Clone, Copy, PartialEq, Reflect)]
 pub struct PlayerWeapons {
 	pub melee: PlayerWeaponMelee,
 	pub ranged: PlayerWeaponRanged,
 }
 
-#[derive(Component, Debug, Clone, Copy, PartialEq, Reflect, Inspectable)]
+#[derive(Component, Debug, Clone, Copy, PartialEq, Reflect)]
 pub struct PlayerPassives {
 	pub p1: PassiveSkills,
 	pub p2: PassiveSkills,
@@ -369,7 +368,7 @@ pub struct RandomValues {
 	pub twelve: u32,
 }
 
-#[derive(Clone, Copy, Debug, Reflect, Inspectable, PartialEq)]
+#[derive(Clone, Copy, Debug, Reflect, PartialEq)]
 pub enum Ability {
 	MeleeBasic,
 	RangedBasic,
@@ -380,7 +379,7 @@ pub enum Ability {
 	None,
 }
 
-#[derive(Component, Debug, Reflect, Inspectable)]
+#[derive(Component, Debug, Reflect)]
 pub struct PlayerAbilities {
 	pub ability1: Ability,
 	pub ability2: Ability,

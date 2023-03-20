@@ -6,10 +6,9 @@ use crate::core_game::animation::{AnimationState, Facing};
 
 use super::player_structs::{
 	Ability, AnimationParams, DamageKind, Grav, MoveSpeed, MyPlayerAnimations, MyPlayerSounds,
-	Player, PlayerAbilities, PlayerCasts, PlayerDamage,
-	PlayerDamageStats, PlayerGraphics, PlayerInput,
-	PlayerState, PlayerStateBuffer, PlayerStateVariables, PlayerWeaponMelee, PlayerWeaponRanged,
-	PlayerWeapons, SoundParams, StealthMode, TimeDivisions, Vel, WallKick,
+	Player, PlayerAbilities, PlayerCasts, PlayerDamage, PlayerDamageStats, PlayerGraphics,
+	PlayerInput, PlayerState, PlayerStateBuffer, PlayerStateVariables, PlayerWeaponMelee,
+	PlayerWeaponRanged, PlayerWeapons, SoundParams, StealthMode, TimeDivisions, Vel, WallKick,
 };
 
 // use super::player_structs::*;
@@ -678,10 +677,10 @@ pub fn setup_player(
 			SpriteSheetBundle {
 				texture_atlas: texture_atlas_handle.clone(),
 				transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
-				visibility: Visibility { is_visible: true },
-				..Default::default()
+				visibility: Visibility::Visible,
+				..default()
 			},
-			AnimationState::default(),
+			// AnimationState::default(),
 			PlayerGraphics,
 			SoundParams {
 				handle: ice_impact_1.clone(),

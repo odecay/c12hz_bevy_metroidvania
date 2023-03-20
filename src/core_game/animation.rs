@@ -1,11 +1,7 @@
-
-
-
-
 use bevy::prelude::*;
 
 // use bevy::time::Timer;
-use iyes_loopless::prelude::*;
+// use iyes_loopless::prelude::*;
 
 pub struct AnimationPlugin;
 
@@ -14,8 +10,7 @@ impl Plugin for AnimationPlugin {
 		&self,
 		app: &mut App,
 	) {
-		app.add_fixed_timestep_system("my_fixed", 0, animate)
-			.add_fixed_timestep_system("my_fixed", 0, animation_flip);
+		app.add_systems((animate, animation_flip));
 	}
 }
 

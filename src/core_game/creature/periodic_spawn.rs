@@ -1,5 +1,3 @@
-
-
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::{Collider, CollisionGroups, Group, RigidBody};
@@ -284,7 +282,7 @@ pub fn periodic_spawn(
 							(SpriteSheetBundle {
 								texture_atlas: texture_atlas_handle_idle.clone(),
 								transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
-								visibility: Visibility { is_visible: true },
+								// visibility: Visibility { is_visible: true },
 								..Default::default()
 							}),
 							(CreatureGraphics),

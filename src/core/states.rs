@@ -1,11 +1,15 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+use bevy::prelude::States;
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, States)]
 pub enum AppState {
+	#[default]
 	Loading,
 	Loaded,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, States)]
 pub enum GameState {
+	#[default]
 	MainMenu,
 	InGame,
 }

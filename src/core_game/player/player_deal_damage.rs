@@ -1,8 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier2d::{
-	prelude::{Collider, InteractionGroups, QueryFilter, RapierContext},
-	rapier::prelude::Group,
-};
+use bevy_rapier2d::prelude::{Collider, CollisionGroups, Group, QueryFilter, RapierContext};
 
 use crate::core_game::player::player_structs::DamageKind;
 use crate::core_game::player::player_structs::Player;
@@ -65,7 +62,7 @@ pub fn player_deal_damage(
 							collider,
 							1.0,
 							QueryFilter::default()
-								.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_3))
+								.groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_3))
 								.predicate(&|e| !targets.iter().any(|t| *t == e)),
 						);
 
@@ -100,7 +97,7 @@ pub fn player_deal_damage(
 							collider,
 							1.0,
 							QueryFilter::default()
-								.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_3))
+								.groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_3))
 								.predicate(&|e| !targets.iter().any(|t| *t == e)),
 						);
 
@@ -135,7 +132,7 @@ pub fn player_deal_damage(
 						collider,
 						1.0,
 						QueryFilter::default()
-							.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_3)),
+							.groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_3)),
 					);
 
 					if let Some((entity, _toii)) = hit_rbg {
@@ -157,8 +154,7 @@ pub fn player_deal_damage(
 				let mut targets_right = Vec::new();
 				let mut targets_left = Vec::new();
 				if sprite.index == 1 || sprite.index == 3 {
-					if (sprite.index == 1 && !sprite.flip_x)
-						|| (sprite.index == 3 && sprite.flip_x)
+					if (sprite.index == 1 && !sprite.flip_x) || (sprite.index == 3 && sprite.flip_x)
 					{
 						loop {
 							let hit_whirl_right = rapier_context.cast_shape(
@@ -169,7 +165,7 @@ pub fn player_deal_damage(
 								collider,
 								1.0,
 								QueryFilter::default()
-									.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_3))
+									.groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_3))
 									.predicate(&|e| !targets_right.iter().any(|t| *t == e)),
 							);
 
@@ -188,8 +184,7 @@ pub fn player_deal_damage(
 						damage.direction = 1.0;
 					}
 
-					if (sprite.index == 1 && sprite.flip_x)
-						|| (sprite.index == 3 && !sprite.flip_x)
+					if (sprite.index == 1 && sprite.flip_x) || (sprite.index == 3 && !sprite.flip_x)
 					{
 						loop {
 							let hit_whirl_left = rapier_context.cast_shape(
@@ -200,7 +195,7 @@ pub fn player_deal_damage(
 								collider,
 								1.0,
 								QueryFilter::default()
-									.groups(InteractionGroups::new(Group::GROUP_2, Group::GROUP_3))
+									.groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_3))
 									.predicate(&|e| !targets_left.iter().any(|t| *t == e)),
 							);
 
