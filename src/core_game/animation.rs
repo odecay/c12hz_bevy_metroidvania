@@ -31,6 +31,15 @@ pub enum Facing {
 	Right,
 }
 
+impl From<Facing> for f32 {
+	fn from(facing: Facing) -> Self {
+		match facing {
+			Facing::Left => -1.0,
+			Facing::Right => 1.0,
+		}
+	}
+}
+
 //in future might want to fork benimator and add metadata to Frames struct
 #[derive(Component, Deref)]
 pub struct Animation(benimator::Animation);

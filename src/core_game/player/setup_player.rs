@@ -32,6 +32,13 @@ pub fn setup_player(
 			9.0,
 		);
 
+		// commands.spawn((
+		// 	TransformBundle {
+		// 		local: transform,
+		// 		..Default::default()
+		// 	},
+		// 	))
+
 		// SET UP PHYSICS ENTITY
 		commands.spawn((
 			TransformBundle {
@@ -106,6 +113,7 @@ pub fn setup_player(
 					old: PlayerState::default(),
 					new: PlayerState::default(),
 				},
+				//should be right or default but left rn to test sprite flipping
 				Facing::Left,
 				PlayerDamage {
 					dealt: false,
@@ -179,6 +187,7 @@ pub fn setup_player(
 
 		let perfect_transitions = true;
 
+		//put these in folder, load with asset_loader
 		// PRELOAD SOUNDS
 		let ice_impact_1: Handle<AudioSource> = asset_server.load("sound/HammerImpactIce1.ogg");
 		let ice_impact_2: Handle<AudioSource> = asset_server.load("sound/HammerImpactIce2.ogg");
