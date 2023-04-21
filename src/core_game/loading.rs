@@ -2,7 +2,7 @@ use crate::core::states::AppState;
 use bevy::{prelude::*, utils::HashMap};
 use bevy_asset_loader::prelude::*;
 
-struct LoadingPlugin;
+pub struct LoadingPlugin;
 
 impl Plugin for LoadingPlugin {
 	fn build(
@@ -12,21 +12,43 @@ impl Plugin for LoadingPlugin {
 		app.add_loading_state(
 			LoadingState::new(AppState::Loading).continue_to_state(AppState::Loaded),
 		)
+		.add_dynamic_collection_to_loading_state::<_, StandardDynamicAssetCollection>(
+			AppState::Loading,
+			"player/player.assets.ron",
+		)
 		.add_collection_to_loading_state::<_, PlayerAssets>(AppState::Loading)
-		.add_system(load_player_assets.in_schedule(OnEnter(AppState::Loaded)));
+		.add_system(check_loaded.in_schedule(OnEnter(AppState::Loaded)));
+		// .add_system(check_loaded.run_if(in_state(AppState::Loaded)));
 	}
 }
 
 #[derive(AssetCollection, Resource)]
 struct PlayerAssets {
 	// A folder loaded to typed asset handles mapped with their file names (not supported on the web)
-	#[asset(path = "player/sound", collection(typed, mapped))]
-	audio_assets: HashMap<String, Handle<AudioSource>>,
+	// #[asset(path = "player/sound", collection(typed, mapped))]
+	// audio_assets: HashMap<String, Handle<AudioSource>>,
 	#[asset(key = "ice_impact", collection(typed, mapped))]
 	ice_impact: HashMap<String, Handle<AudioSource>>,
+	#[asset(key = "hammer_impact", collection(typed, mapped))]
+	hammer_impact: HashMap<String, Handle<AudioSource>>,
+	#[asset(key = "bass_hit", collection(typed, mapped))]
+	bass_hit: HashMap<String, Handle<AudioSource>>,
+	#[asset(key = "footstep", collection(typed, mapped))]
+	footstep: HashMap<String, Handle<AudioSource>>,
 }
 
-fn load_player_assets() {
+fn check_loaded(
+	assets: Res<PlayerAssets>,
+	sounds: Res<Assets<AudioSource>>,
+	asset_server: Res<AssetServer>,
+) {
+	for (key, handle) in assets.ice_impact.iter() {
+		// if let Some(sound) = sounds.get(handle) {
+		let load_state = asset_server.get_load_state(handle);
+		println!("{}: {:?}", key, load_state);
+		// println!("{}:", key);
+		// }
+	}
 
 	// let ice_impact_1: Handle<AudioSource> = asset_server.load("sound/HammerImpactIce1.ogg");
 	// let ice_impact_2: Handle<AudioSource> = asset_server.load("sound/HammerImpactIce2.ogg");

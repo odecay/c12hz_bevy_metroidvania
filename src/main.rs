@@ -77,6 +77,7 @@ fn main() {
 		.add_plugin(RapierDebugRenderPlugin::default())
 		.add_plugin(core::setup::SetupPlugin)
 		.add_plugin(core_game::world::WorldPlugin)
+		.add_plugin(core_game::loading::LoadingPlugin)
 		.add_plugin(core_game::player::PlayerPlugin)
 		.add_plugin(core_game::creature::CreaturePlugin)
 		.add_plugin(core_game::animation::AnimationPlugin)

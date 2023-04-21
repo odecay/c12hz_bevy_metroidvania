@@ -1,3 +1,20 @@
 ({
+  "ice_impact": Files (
+    paths: ["player/sound/HammerImpactIce1.ogg", "player/sound/HammerImpactIce2.ogg", "player/sound/HammerImpactIce3.ogg", 
+    "player/sound/HammerImpactIce4.ogg", "player/sound/HammerImpactIce5.ogg", "player/sound/HammerImpactIce6.ogg", "player/sound/HammerImpactIce7.ogg"],
+  ),
+
+  "hammer_impact": Files (
+    paths: ["player/sound/HammerImpact1.ogg", "player/sound/HammerImpact2.ogg", "player/sound/HammerImpact3.ogg", "player/sound/HammerImpact4.ogg"]
+  ),
+
+  "bass_hit": Files (
+    paths: ["player/sound/ImpactBass1.ogg", "player/sound/ImpactBass2.ogg"]
+  ),
+
+  "footstep": Files (
+    paths: ["player/sound/Footstep1.ogg", "player/sound/Footstep2.ogg", "player/sound/Footstep3.ogg", "player/sound/Footstep4.ogg",
+    "player/sound/Footstep5.ogg", "player/sound/Footstep6.ogg", "player/sound/Footstep7.ogg", "player/sound/Footstep8.ogg", "player/sound/Footstep9.ogg"]
+  )
 
   })

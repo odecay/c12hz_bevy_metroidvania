@@ -10,7 +10,10 @@ bevy_ecs_ldtk = { version = "0.6.0", features = ["atlas"] }
 bevy = "0.10"
 # bevy_common_assets = { version = "0.6", features = ["yaml"] }
 # bevy_asset_loader = "0.16.0"
-bevy_asset_loader = { version = "0.16", features = ["2d"] }
+bevy_asset_loader = { version = "0.16", features = [
+  "2d",
+  "standard_dynamic_assets",
+] }
 bevy_rapier2d = "0.21.0"
 # bevy_ecs_ldtk = { git = "https://github.com/Trouv/bevy_ecs_ldtk" }
 rand = "0.8.5"
