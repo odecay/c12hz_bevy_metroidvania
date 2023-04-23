@@ -120,6 +120,16 @@ pub enum PlayerAnimationState {
 	RangedBasicGunsForward,
 	RangedBasicGunsUp,
 }
+impl PlayerAnimationState {
+	pub fn is_attacking(&self) -> bool {
+		match self {
+			PlayerAnimationState::MeleeBasicHammer
+			| PlayerAnimationState::MeleeBasicSword
+			| PlayerAnimationState::RangedBasicGunsForward => true,
+			_ => false,
+		}
+	}
+}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PlayerAttackState {
