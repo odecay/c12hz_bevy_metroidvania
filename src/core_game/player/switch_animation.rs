@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::core_game::player::player_structs::MyPlayerAnimations;
-use crate::core_game::player::player_structs::PlayerAnimationState;
+use crate::core_game::player::player_structs::PlayerAnimationState::*;
 use crate::core_game::player::player_structs::PlayerDirectionState;
 use crate::core_game::player::player_structs::PlayerStateBuffer;
 use crate::core_game::player::player_structs::Vel;
@@ -19,116 +19,50 @@ pub fn switch_animation(
 ) {
 	if let Some(anims) = anims {
 		for (state, velocity) in vel_query.iter() {
-			if state.new.animation == PlayerAnimationState::Fall && velocity.y == 0.0 {
+			if state.new.animation == Fall && velocity.y == 0.0 {
 				*float_counter += 1;
 			}
-			if state.new.animation != PlayerAnimationState::Fall {
+			if state.new.animation != Fall {
 				*float_counter = 0;
 			}
 			for e in player_query.iter() {
-				if state.new.animation == PlayerAnimationState::Run {
-					commands.entity(e).insert(anims.run.clone());
+				let same_attack: bool = state.new.attack != state.old.attack;
+				if (same_attack && state.new.animation.is_attacking()) {
+					*clock = !*clock;
 				}
+				let no_direction: bool = state.new.direction == PlayerDirectionState::None;
 
-				if state.new.animation == PlayerAnimationState::Idle {
-					commands.entity(e).insert(anims.idle.clone());
-				}
-
-				if state.new.animation == PlayerAnimationState::Jump {
-					if state.new.direction == PlayerDirectionState::None {
-						commands.entity(e).insert(anims.jump.clone());
-					} else {
-						commands.entity(e).insert(anims.jumpd.clone());
-					}
-				}
-
-				//technically player can sometimes still have upwards velocity in the Fall state
-				//because ending the jump early will move to Fall state but the velocity is not immediately set to 0
-				//but is instead cut 3 times to make it look more natural
-				//that's why I'm also checking here if velocity is less than 0.0 to start the Fall animation.
-				if state.new.animation == PlayerAnimationState::Fall && velocity.y < 0.0 {
-					commands.entity(e).insert(anims.fall.clone());
-				}
-
-				if state.new.animation == PlayerAnimationState::WallSlide {
-					commands.entity(e).insert(anims.slide.clone());
-				}
-
-				if state.new.animation == PlayerAnimationState::WhirlwindHammer {
-					commands.entity(e).insert(anims.whirl.clone());
-				}
-
-				if state.new.animation == PlayerAnimationState::RunIdle {
-					commands.entity(e).insert(anims.runidle.clone());
-				}
-
-				if state.new.animation == PlayerAnimationState::IdleWhirlwind {
-					commands.entity(e).insert(anims.idlewhirl.clone());
-				}
-
-				if state.new.animation == PlayerAnimationState::WhirlwindIdle {
-					commands.entity(e).insert(anims.whirlidle.clone());
-				}
-
-				if state.new.animation == PlayerAnimationState::FallIdle {
-					commands.entity(e).insert(anims.fallidle.clone());
-				}
-
-				if state.new.animation == PlayerAnimationState::MeleeBasicSword {
-					if state.new.attack != state.old.attack {
-						*clock = !*clock;
+				let cloned = match state.new.animation {
+					Run 						=> anims.run.clone(),
+					Idle 						=> anims.idle.clone(),
+					Jump if no_direction 		=> anims.jump.clone(),
+					Jump 						=> anims.jumpd.clone(),
+					Fall if velocity.y < 0.0 	=> anims.fall.clone(),
+					WallSlide 					=> anims.slide.clone(),
+					WhirlwindHammer 			=> anims.whirl.clone(),
+					RunIdle 					=> anims.runidle.clone(),
+				    IdleWhirlwind 				=> anims.idlewhirl.clone(),
+				    WhirlwindIdle 				=> anims.whirlidle.clone(),
+					FallIdle 					=> anims.fallidle.clone(),
+					MeleeBasicSword if *clock 	=> anims.mbs1.clone(),
+					MeleeBasicSword 			=> anims.mbs2.clone(),
+					MeleeBasicHammer if *clock 	=> anims.mbh1.clone(),
+					MeleeBasicHammer 			=> anims.mbh2.clone(),
+					RangedBasicGunsForward 		=> anims.rbgf1.clone(),
+					RangedBasicGunsUp if *clock => anims.rbgu1.clone(),
+					RangedBasicBowForward 		=> anims.rbbf.clone(),
+					RangedBasicBowUp 			=> anims.rbbu.clone(),
+					Fall => {
+						println!("no fall state with velocity y: {:?}", velocity.y);
+						anims.fall.clone()
+					},
+					x => {
+						println!("No current arm for the state: {:?}", x);
+						anims.idle.clone()
 					}
 
-					if *clock {
-						commands.entity(e).insert(anims.mbs1.clone());
-					} else {
-						commands.entity(e).insert(anims.mbs2.clone());
-					}
-				}
-
-				if state.new.animation == PlayerAnimationState::MeleeBasicHammer {
-					if state.new.attack != state.old.attack {
-						*clock = !*clock;
-					}
-
-					if *clock {
-						commands.entity(e).insert(anims.mbh1.clone());
-					} else {
-						commands.entity(e).insert(anims.mbh2.clone());
-					}
-				}
-
-				if state.new.animation == PlayerAnimationState::RangedBasicBowForward {
-					commands.entity(e).insert(anims.rbbf.clone());
-				}
-
-				if state.new.animation == PlayerAnimationState::RangedBasicBowUp {
-					commands.entity(e).insert(anims.rbbu.clone());
-				}
-
-				if state.new.animation == PlayerAnimationState::RangedBasicGunsForward {
-					if state.new.attack != state.old.attack {
-						*clock = !*clock;
-					}
-
-					if *clock {
-						commands.entity(e).insert(anims.rbgf1.clone());
-					} else {
-						commands.entity(e).insert(anims.rbgf2.clone());
-					}
-				}
-
-				if state.new.animation == PlayerAnimationState::RangedBasicGunsUp {
-					if state.new.attack != state.old.attack {
-						*clock = !*clock;
-					}
-
-					if *clock {
-						commands.entity(e).insert(anims.rbgu1.clone());
-					} else {
-						commands.entity(e).insert(anims.rbgu2.clone());
-					}
-				}
+				};
+				commands.entity(e).insert(cloned);
 			}
 		}
 	}
