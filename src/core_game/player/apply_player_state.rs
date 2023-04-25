@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::Velocity;
 //use bevy::render::render_resource::PipelineLayout;
 
 use crate::core_game::player::player_structs::Grav;
@@ -27,6 +28,52 @@ use super::player_structs::PlayerAttackState;
 // It gives much more precision and control over what's going on, and I'm really happy with how the jump/fall feels now
 // Also you might notice there are 7 time-step frames with 0 vertical velocity at the very top of every jump (or 3 frames if you end the jump early)
 // This is intentional, as I find it makes the jump feel better, and gives the player a little more time to position themselves in air
+
+/// Handle the jump state
+/// # Arguments:
+///
+fn handle_jump_state(state: &PlayerStateBuffer,
+					 velocity: &Vel,
+					 gravity: &Grav,
+					 speed: &MoveSpeed,
+					 wall_kick: &WallKick,
+					 input: &PlayerInput
+) -> (f32, f32, f32, f32, i32){
+	let (mut x, mut y, mut c) = (velocity.x, velocity.y, gravity.counter);
+
+	let move_left = input.pressing_left;
+	let move_right = input.pressing_right;
+
+	x = match (move_left, move_right) {
+		(true, _)     => -speed.x,
+		(false, true) => speed.x,
+		(_, _)        => 0.0
+	};
+
+	if state.new.movement != state.old.movement {
+		y = speed.y;
+	}
+
+	if state.new.movement != state.old.movement {
+		c = 0;
+	}
+
+	if gravity.counter == 3 {
+		y -= gravity.strength;
+	}
+
+	c += 1;
+
+	if gravity.counter > 3 {
+		c = 1;
+	}
+
+	if velocity.y < 0.0 {
+		y = 0.0
+	}
+
+	(velocity.dir, x, y, gravity.speed, c)
+}
 
 pub fn apply_player_state(
 	mut query: Query<
@@ -87,150 +134,90 @@ pub fn apply_player_state(
 				};
 			}
 
-			// IDLE
+			(velocity.dir, velocity.x, velocity.y, gravity.speed, gravity.counter) = match (state.new.movement, state.new.direction) {
+				(PlayerMoveState::Idle, _)                          => (velocity.dir, 0.0, 0.0, 0.0, 0), // Remove deceleration
+				(PlayerMoveState::Run, PlayerDirectionState::Right) => (velocity.dir, speed_x, 0.0, 0.0, 0),
+				(PlayerMoveState::Run, PlayerDirectionState::Left)  => (velocity.dir, -speed_x, 0.0, 0.0, 0),
+				(PlayerMoveState::Jump, _)                          => handle_jump_state(state, &velocity, &gravity, &speed, &wall_kick, input),
+				(_, _) => (velocity.dir, velocity.x, velocity.y, gravity.speed, gravity.counter)
+				//(PlayerMoveState::Idle, _) => (velocity.dir, 0.0, 0.0, 0.0, 0),
+				//(_, _) => (1.0, velocity.x, velocity.y, 0.0, 0)
+			};
 
-			if state.new.movement == PlayerMoveState::Idle {
-				// Deceleration in the Right direction
-				if state.old.direction == PlayerDirectionState::Right {
-					velocity.dir = 1.0;
-				}
-				if velocity.dir == 1.0 {
-					if velocity.x > 0.0 {
-						velocity.x -= 0.25;
-					}
-					if velocity.x <= 0.0 {
-						velocity.x = 0.0;
-						velocity.dir = 0.0;
-					}
-				}
+			// if state.new.movement == PlayerMoveState::Jump {
+			// 	if state.new.direction != state.old.direction {
+			// 		velocity.x = 0.0;
+			// 	}
 
-				// Deceleration in the Left direction
-				if state.old.direction == PlayerDirectionState::Left {
-					velocity.dir = -1.0;
-				}
-				if velocity.dir == -1.0 {
-					if velocity.x < 0.0 {
-						velocity.x += 0.25;
-					}
-					if velocity.x >= 0.0 {
-						velocity.x = 0.0;
-						velocity.dir = 0.0;
-					}
-				}
+			// 	if state.new.movement != state.old.movement {
+			// 		velocity.y = 0.0;
+			// 		velocity.y += speed.y;
+			// 	}
 
-				// Resetting various variables
-				gravity.speed = 0.0;
-				gravity.counter = 0;
-				velocity.y = 0.0;
-			}
+			// 	if state.new.movement != state.old.movement {
+			// 		gravity.counter = 0;
+			// 	}
 
-			// RUN
+			// 	if gravity.counter == 3 {
+			// 		velocity.y -= gravity.strength;
+			// 	}
 
-			if state.new.movement == PlayerMoveState::Run {
-				if state.new.direction != state.old.direction {
-					velocity.x = 0.0;
-				}
-				// Acceleration + Run in the Right direction
-				if state.new.direction == PlayerDirectionState::Right {
-					if velocity.x < speed_x {
-						velocity.x += 0.5;
-					}
-					if velocity.x > speed_x {
-						velocity.x = speed_x;
-					}
-				}
-				// Acceleration + Run in the Left direction
-				if state.new.direction == PlayerDirectionState::Left {
-					if velocity.x > -speed_x {
-						velocity.x -= 0.5;
-					}
-					if velocity.x < -speed_x {
-						velocity.x = -speed_x;
-					}
-				}
+			// 	gravity.counter += 1;
 
-				// Resetting various variables
-				gravity.speed = 0.0;
-				gravity.counter = 0;
-				velocity.y = 0.0
-			}
+			// 	if gravity.counter > 3 {
+			// 		gravity.counter = 1;
+			// 	}
 
-			// JUMP
+			// 	if velocity.y < 0.0 {
+			// 		velocity.y = 0.0;
+			// 	}
 
-			if state.new.movement == PlayerMoveState::Jump {
-				if state.new.direction != state.old.direction {
-					velocity.x = 0.0;
-				}
+			// 	// Acceleration + Jump in the Right direction
+			// 	if state.new.direction == PlayerDirectionState::Right {
+			// 		if velocity.x < speed_x {
+			// 			velocity.x += 0.25;
+			// 		}
+			// 		if velocity.x > speed_x {
+			// 			velocity.x = speed_x;
+			// 		}
+			// 	}
 
-				if state.new.movement != state.old.movement {
-					velocity.y = 0.0;
-					velocity.y += speed.y;
-				}
+			// 	// Acceleration + Jump in the Left direction
+			// 	if state.new.direction == PlayerDirectionState::Left {
+			// 		if velocity.x > -speed_x {
+			// 			velocity.x -= 0.25;
+			// 		}
+			// 		if velocity.x < -speed_x {
+			// 			velocity.x = -speed_x;
+			// 		}
+			// 	}
 
-				if state.new.movement != state.old.movement {
-					gravity.counter = 0;
-				}
+			// 	// Deceleration during Jump, currently instant (feels precise)
+			// 	if state.new.direction == PlayerDirectionState::None {
+			// 		velocity.x = 0.0;
+			// 	}
 
-				if gravity.counter == 3 {
-					velocity.y -= gravity.strength;
-				}
+			// 	// Wall Jump
+			// 	if state.old.movement == PlayerMoveState::WallSlide {
+			// 		wall_kick.timer += 1;
+			// 		if move_right && !move_left {
+			// 			wall_kick.wall_direction = 1.0;
+			// 		} else if move_left && !move_right {
+			// 			wall_kick.wall_direction = -1.0;
+			// 		} else {
+			// 			wall_kick.wall_direction = 0.0;
+			// 		}
+			// 	}
 
-				gravity.counter += 1;
+			// 	if wall_kick.timer > 0 {
+			// 		velocity.x = speed_x * -wall_kick.wall_direction;
+			// 		wall_kick.timer += 1;
+			// 	}
 
-				if gravity.counter > 3 {
-					gravity.counter = 1;
-				}
-
-				if velocity.y < 0.0 {
-					velocity.y = 0.0;
-				}
-
-				// Acceleration + Jump in the Right direction
-				if state.new.direction == PlayerDirectionState::Right {
-					if velocity.x < speed_x {
-						velocity.x += 0.25;
-					}
-					if velocity.x > speed_x {
-						velocity.x = speed_x;
-					}
-				}
-
-				// Acceleration + Jump in the Left direction
-				if state.new.direction == PlayerDirectionState::Left {
-					if velocity.x > -speed_x {
-						velocity.x -= 0.25;
-					}
-					if velocity.x < -speed_x {
-						velocity.x = -speed_x;
-					}
-				}
-
-				// Deceleration during Jump, currently instant (feels precise)
-				if state.new.direction == PlayerDirectionState::None {
-					velocity.x = 0.0;
-				}
-
-				// Wall Jump
-				if state.old.movement == PlayerMoveState::WallSlide {
-					wall_kick.timer += 1;
-					if move_right && !move_left {
-						wall_kick.wall_direction = 1.0;
-					} else if move_left && !move_right {
-						wall_kick.wall_direction = -1.0;
-					} else {
-						wall_kick.wall_direction = 0.0;
-					}
-				}
-
-				if wall_kick.timer > 0 {
-					velocity.x = speed_x * -wall_kick.wall_direction;
-					wall_kick.timer += 1;
-				}
-
-				if wall_kick.timer >= 7 {
-					wall_kick.timer = 0;
-				}
-			}
+			// 	if wall_kick.timer >= 7 {
+			// 		wall_kick.timer = 0;
+			// 	}
+			// }
 
 			// FALL
 

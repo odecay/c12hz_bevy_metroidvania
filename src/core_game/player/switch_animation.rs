@@ -49,7 +49,7 @@ pub fn switch_animation(
 					MeleeBasicHammer if *clock 			=> anims.mbh1.clone(),
 					MeleeBasicHammer 					=> anims.mbh2.clone(),
 					RangedBasicGunsForward if *clock 	=> anims.rbgf1.clone(),
-					RangedBasicGunsForward           	=> anims.rbgf2.clone(),
+					RangedBasicGunsForward           	=> anims.rbgf1.clone(),
 					RangedBasicGunsUp if *clock      	=> anims.rbgu1.clone(),
 					RangedBasicGunsUp                	=> anims.rbgu2.clone(),
 					RangedBasicBowForward 				=> anims.rbbf.clone(),

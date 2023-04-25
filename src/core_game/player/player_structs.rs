@@ -172,6 +172,12 @@ pub struct PlayerStateBuffer {
 	//rename to next
 	pub new: PlayerState,
 }
+impl PlayerStateBuffer {
+	/// Return true or false if current direction same as previous direction
+	pub fn same_dir(&self) -> bool {
+		self.new.direction == self.old.direction
+	}
+}
 
 // various variables used for determining player state.
 // for example a frame counter variable to determine how long a jump state can last
