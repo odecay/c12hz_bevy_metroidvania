@@ -14,7 +14,11 @@ impl Plugin for LoadingPlugin {
 		)
 		.add_dynamic_collection_to_loading_state::<_, StandardDynamicAssetCollection>(
 			AppState::Loading,
-			"player/player.assets.ron",
+			"player/audio.assets.ron",
+		)
+		.add_dynamic_collection_to_loading_state::<_, StandardDynamicAssetCollection>(
+			AppState::Loading,
+			"player/animations.assets.ron",
 		)
 		.add_collection_to_loading_state::<_, PlayerAssets>(AppState::Loading)
 		.add_system(check_loaded.in_schedule(OnEnter(AppState::Loaded)));
@@ -24,9 +28,7 @@ impl Plugin for LoadingPlugin {
 
 #[derive(AssetCollection, Resource)]
 struct PlayerAssets {
-	// A folder loaded to typed asset handles mapped with their file names (not supported on the web)
-	// #[asset(path = "player/sound", collection(typed, mapped))]
-	// audio_assets: HashMap<String, Handle<AudioSource>>,
+	//audio
 	#[asset(key = "ice_impact", collection(typed, mapped))]
 	ice_impact: HashMap<String, Handle<AudioSource>>,
 	#[asset(key = "hammer_impact", collection(typed, mapped))]
@@ -35,6 +37,12 @@ struct PlayerAssets {
 	bass_hit: HashMap<String, Handle<AudioSource>>,
 	#[asset(key = "footstep", collection(typed, mapped))]
 	footstep: HashMap<String, Handle<AudioSource>>,
+
+	//animations
+	#[asset(key = "run")]
+	run: Handle<TextureAtlas>,
+	#[asset(key = "idle")]
+	idle: Handle<TextureAtlas>,
 }
 
 fn check_loaded(

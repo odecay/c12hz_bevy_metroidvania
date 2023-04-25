@@ -1,0 +1,18 @@
+({
+  "run": TextureAtlas (
+    path: "player/animations/newrun4c6.png",
+    tile_size_x: 16,
+    tile_size_y: 16,
+    columns: 7,
+    rows: 1,
+  )
+
+  "idle": TextureAtlas (
+    path: "player/animations/PlayerFinal.png",
+    tile_size_x: 16,
+    tile_size_y: 16,
+    columns: 1,
+    rows: 1,
+  )
+
+  })
