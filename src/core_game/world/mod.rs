@@ -16,7 +16,8 @@ impl Plugin for WorldPlugin {
 		app: &mut App,
 	) {
 		app.add_startup_system(setup_world::setup_world)
-			.add_system(player::setup_player::setup_player.after(setup_world::setup_world))
+			// .add_system(player::setup_player::setup_player.after(setup_world::setup_world))
+			// .add_system(.in_schedule(OnEnter(AppState::Loaded)))
 			.add_system(creature::setup_creature::setup_creature.after(setup_world::setup_world))
 			.add_system(
 				creature::periodic_spawn::periodic_spawn

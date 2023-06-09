@@ -27,28 +27,29 @@ impl Plugin for LoadingPlugin {
 }
 
 #[derive(AssetCollection, Resource)]
-struct PlayerAssets {
+pub struct PlayerAssets {
 	//audio
 	#[asset(key = "ice_impact", collection(typed, mapped))]
-	ice_impact: HashMap<String, Handle<AudioSource>>,
+	pub ice_impact: HashMap<String, Handle<AudioSource>>,
 	#[asset(key = "hammer_impact", collection(typed, mapped))]
-	hammer_impact: HashMap<String, Handle<AudioSource>>,
+	pub hammer_impact: HashMap<String, Handle<AudioSource>>,
 	#[asset(key = "bass_hit", collection(typed, mapped))]
-	bass_hit: HashMap<String, Handle<AudioSource>>,
+	pub bass_hit: HashMap<String, Handle<AudioSource>>,
 	#[asset(key = "footstep", collection(typed, mapped))]
-	footstep: HashMap<String, Handle<AudioSource>>,
+	pub footstep: HashMap<String, Handle<AudioSource>>,
 
 	//animations
 	#[asset(key = "run")]
-	run: Handle<TextureAtlas>,
+	pub run: Handle<TextureAtlas>,
 	#[asset(key = "idle")]
-	idle: Handle<TextureAtlas>,
+	pub idle: Handle<TextureAtlas>,
 }
 
 fn check_loaded(
 	assets: Res<PlayerAssets>,
 	sounds: Res<Assets<AudioSource>>,
 	asset_server: Res<AssetServer>,
+	mut commands: Commands,
 ) {
 	for (key, handle) in assets.ice_impact.iter() {
 		// if let Some(sound) = sounds.get(handle) {
@@ -57,6 +58,24 @@ fn check_loaded(
 		// println!("{}:", key);
 		// }
 	}
+	//test camera, wrong scale but lets me see sprites positioned somewhere
+	// commands.spawn(Camera2dBundle::default());
+
+	// commands.spawn((
+	// 	SpriteSheetBundle {
+	// 		texture_atlas: assets.run.clone(),
+	// 		sprite: TextureAtlasSprite::new(1),
+	// 		transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
+	// 		visibility: Visibility::Visible,
+	// 		..default()
+	// 	},
+	// 	super::animation::AnimationState::default(),
+	// 	super::animation::Animation(benimator::Animation::from_indices(
+	// 		0..=6,
+	// 		benimator::FrameRate::from_fps(12.0),
+	// 	)),
+	// ));
+	// println!("Loaded!");
 
 	// let ice_impact_1: Handle<AudioSource> = asset_server.load("sound/HammerImpactIce1.ogg");
 	// let ice_impact_2: Handle<AudioSource> = asset_server.load("sound/HammerImpactIce2.ogg");

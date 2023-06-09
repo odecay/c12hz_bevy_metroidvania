@@ -40,28 +40,23 @@ impl From<Facing> for f32 {
 	}
 }
 
-//in future might want to fork benimator and add metadata to Frames struct
 #[derive(Component, Deref)]
-pub struct Animation(benimator::Animation);
+pub struct Animation(pub benimator::Animation);
 
 #[derive(Default, Component, Deref, DerefMut)]
-pub struct AnimationState(benimator::State);
+pub struct AnimationState(pub benimator::State);
 
 fn animate(
 	time: Res<Time>,
-	// animations: Res<Assets<Animation>>,
-	mut query: Query<(
-		&mut AnimationState,
-		&mut TextureAtlasSprite,
-		// &Handle<Animation>,
-		&Animation,
-	)>,
+	mut query: Query<(&mut AnimationState, &mut TextureAtlasSprite, &Animation)>,
 ) {
 	for (mut state, mut sprite, animation) in query.iter_mut() {
 		state.update(animation, time.delta());
 		sprite.index = state.frame_index();
 	}
 }
+
+//animation state hydration?
 
 // fn switch_animation_on_state_transition(mut query: Query<(&mut AnimationState, &mut Animation)>) {}
 //

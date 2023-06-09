@@ -15,6 +15,6 @@
   "footstep": Files (
     paths: ["player/sound/Footstep1.ogg", "player/sound/Footstep2.ogg", "player/sound/Footstep3.ogg", "player/sound/Footstep4.ogg",
     "player/sound/Footstep5.ogg", "player/sound/Footstep6.ogg", "player/sound/Footstep7.ogg", "player/sound/Footstep8.ogg", "player/sound/Footstep9.ogg"]
-  )
+  ),
 
   })

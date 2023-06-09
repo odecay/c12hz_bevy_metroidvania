@@ -3,6 +3,8 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{LdtkPlugin, LdtkSystemSet};
 use bevy_rapier2d::prelude::*;
+use leafwing_input_manager::prelude::InputManagerPlugin;
+use seldom_state::prelude::*;
 // use iyes_loopless::prelude::*;
 //use std::time::Duration;
 use bevy::window::PresentMode;
@@ -49,7 +51,11 @@ use crate::creature::periodic_spawn::*;
 use crate::creature::transfer_data_creature::*;
 use crate::creature::creature_death::*;
 
+
 */
+
+//dont like this being here
+use crate::core_game::player::state::PlayerAction;
 
 fn main() {
 	App::new()
@@ -78,8 +84,10 @@ fn main() {
 		.add_plugin(core::setup::SetupPlugin)
 		.add_plugin(core_game::world::WorldPlugin)
 		.add_plugin(core_game::loading::LoadingPlugin)
+		.add_plugin(InputManagerPlugin::<PlayerAction>::default())
+		.add_plugin(StateMachinePlugin)
 		.add_plugin(core_game::player::PlayerPlugin)
-		.add_plugin(core_game::creature::CreaturePlugin)
+		// .add_plugin(core_game::creature::CreaturePlugin)
 		.add_plugin(core_game::animation::AnimationPlugin)
 		.add_plugin(WorldInspectorPlugin::new())
 		// .register_inspectable::<core_game::player::player_structs::PlayerAbilities>()

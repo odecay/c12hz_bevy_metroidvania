@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::core_game::player::player_structs::Camera;
+// use crate::core_game::player::player_structs::Camera;
 use crate::core_game::player::player_structs::CameraVariables;
 use bevy_ecs_ldtk::prelude::*;
 
@@ -32,7 +32,7 @@ pub fn setup_camera(
 				transform: camera_transform,
 				..default()
 			})
-			.insert(Camera)
+			// .insert(Camera)
 			.insert(CameraVariables {
 				new_ground_height: 0.0,
 			});

@@ -1,4 +1,8 @@
+use crate::core::states::AppState;
 use bevy::prelude::*;
+
+use self::state::init_input;
+use self::state::init_state;
 // use iyes_loopless::prelude::*;
 
 mod animate;
@@ -6,6 +10,7 @@ mod apply_player_state;
 mod audio_test;
 mod generate_randomness;
 pub mod get_player_input;
+mod input;
 mod move_camera;
 mod movement_and_collisions;
 mod player_casts;
@@ -18,6 +23,7 @@ mod set_attack_state;
 mod set_move_state;
 pub mod setup_camera;
 pub mod setup_player;
+pub mod state;
 mod switch_animation;
 mod teleport_to_spawn;
 mod time_divisions;
@@ -32,6 +38,19 @@ impl Plugin for PlayerPlugin {
 	) {
 		app.add_systems(
 			(
+				// setup_player::setup_player.in_schedule(OnEnter(AppState::Loaded)),
+				setup_player::setup_player,
+				apply_system_buffers,
+				init_input,
+				init_state,
+			)
+				.chain()
+				.in_schedule(OnEnter(AppState::Loaded)),
+		)
+		.add_system(state::runnning.in_set(OnUpdate(AppState::Loaded)))
+		.add_systems(
+			(
+				//setup_player,
 				player_casts::player_casts,
 				set_attack_state::set_attack_state,
 				set_move_state::set_move_state,
@@ -43,109 +62,13 @@ impl Plugin for PlayerPlugin {
 				screen_shake::screen_shake,
 				set_animation_state::set_animation_state,
 				switch_animation::switch_animation,
-				time_divisions::time_divisions,
-				animate::animate,
+				// time_divisions::time_divisions,
+				// animate::animate,
 				reset_player_input::reset_player_input,
 				player_deal_damage::player_deal_damage,
 			)
 				.chain()
 				.in_schedule(CoreSchedule::FixedUpdate),
 		);
-		// // app.add_fixed_timestep_system("my_fixed", 0, generate_randomness::generate_randomness)
-		// app.add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	player_casts::player_casts.label("player_casts"),
-		// )
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	set_attack_state::set_attack_state.label("set_attack_state"),
-		// )
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	set_move_state::set_move_state
-		// 		.label("set_move_state")
-		// 		.after("set_attack_state")
-		// 		.after("player_casts"),
-		// )
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	apply_player_state::apply_player_state
-		// 		.label("apply_state")
-		// 		.after("set_move_state"),
-		// )
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	movement_and_collisions::movement_and_collisions
-		// 		.label("move")
-		// 		.after("apply_state"),
-		// )
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	teleport_to_spawn::teleport_to_spawn.after("move"),
-		// )
-		// .add_fixed_timestep_system("my_fixed", 0, transfer_data::transfer_data.after("move"))
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	move_camera::move_camera
-		// 		.label("move_camera")
-		// 		.after("move")
-		// 		.after("player_casts"),
-		// )
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	screen_shake::screen_shake.after("move_camera"),
-		// )
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	set_animation_state::set_animation_state
-		// 		.label("set_anim")
-		// 		.after("apply_state")
-		// 		.after("player_casts"),
-		// )
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	switch_animation::switch_animation
-		// 		.label("switch_anim")
-		// 		.after("set_anim"),
-		// )
-		// // .add_fixed_timestep_system(
-		// // 	"my_fixed",
-		// // 	0,
-		// // 	time_divisions::time_divisions
-		// // 		.label("time")
-		// // 		.after("set_anim"),
-		// // )
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	animate::animate.label("animate").after("time"),
-		// )
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	player_deal_damage::player_deal_damage
-		// 		.label("deal_damage")
-		// 		.after("animate"),
-		// )
-		// .add_fixed_timestep_system(
-		// 	"my_fixed",
-		// 	0,
-		// 	reset_player_input::reset_player_input.after("deal_damage"),
-		// 	// )
-		// 	// .add_fixed_timestep_system(
-		// 	// 	"my_fixed",
-		// 	// 	0,
-		// 	// 	audio_test::audio_test.label("audio").after("time"),
-		// );
 	}
 }

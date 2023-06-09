@@ -2,19 +2,29 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::{Collider, CollisionGroups, Group, RigidBody};
 
-use crate::core_game::animation::{AnimationState, Facing};
+use leafwing_input_manager::prelude::*;
+use seldom_state::prelude::*;
 
-use super::player_structs::{
-	Ability, AnimationParams, DamageKind, Grav, MoveSpeed, MyPlayerAnimations, MyPlayerSounds,
-	Player, PlayerAbilities, PlayerCasts, PlayerDamage, PlayerDamageStats, PlayerGraphics,
-	PlayerInput, PlayerState, PlayerStateBuffer, PlayerStateVariables, PlayerWeaponMelee,
-	PlayerWeaponRanged, PlayerWeapons, SoundParams, StealthMode, TimeDivisions, Vel, WallKick,
+use crate::core_game::{
+	animation::{self, Animation, AnimationState, Facing},
+	loading::PlayerAssets,
+};
+
+use super::{
+	player_structs::{
+		Ability, AnimationParams, DamageKind, Grav, MoveSpeed, MyPlayerAnimations, MyPlayerSounds,
+		Player, PlayerAbilities, PlayerCasts, PlayerDamage, PlayerDamageStats, PlayerGraphics,
+		PlayerInput, PlayerState, PlayerStateBuffer, PlayerStateVariables, PlayerWeaponMelee,
+		PlayerWeaponRanged, PlayerWeapons, SoundParams, StealthMode, Vel, WallKick,
+	},
+	state::{Idle, PlayerAction, Running},
 };
 
 // use super::player_structs::*;
 
 pub fn setup_player(
 	mut commands: Commands,
+	player_assets: Res<PlayerAssets>,
 	asset_server: Res<AssetServer>,
 	mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 	query: Query<(Entity, &EntityInstance), Added<EntityInstance>>,
@@ -32,152 +42,130 @@ pub fn setup_player(
 			9.0,
 		);
 
-		// commands.spawn((
-		// 	TransformBundle {
-		// 		local: transform,
-		// 		..Default::default()
-		// 	},
-		// 	))
-
 		// SET UP PHYSICS ENTITY
-		commands.spawn((
-			TransformBundle {
-				local: transform,
-				..Default::default()
-			},
-			MoveSpeed { x: 1.25, y: 3.0 },
-			Vel {
-				x: 0.0,
-				y: 0.0,
-				dir: 0.0,
-			},
-			Grav {
-				speed: 0.0,
-				max_speed: 18.0,
-				slide_speed: 3.0,
-				strength: 0.5, // leave this at 0.5, the actual gravity strength is determined by how often gravity is applied, based on a frame counter.
-				counter: 0,
-			},
-			(
-				PlayerInput {
-					pressing_jump: false,
-					just_pressed_jump: false,
-					pressing_left: false,
-					just_pressed_left: false,
-					pressing_right: false,
-					just_pressed_right: false,
-					pressing_dodge: false,
-					just_pressed_dodge: false,
-					pressing_skill1: false,
-					just_pressed_skill1: false,
-					pressing_skill2: false,
-					just_pressed_skill2: false,
-					pressing_skill3: false,
-					just_pressed_skill3: false,
-					pressing_skill4: false,
-					just_pressed_skill4: false,
-					pressing_up: false,
-					just_pressed_up: false,
+		let physics_entity = commands
+			.spawn((
+				SpatialBundle {
+					// transform: transform,
+					..Default::default()
 				},
-				PlayerCasts {
-					basic_up: false,
-					basic_down: false,
-					basic_left: false,
-					basic_right: false,
-					directional_x: false,
-					big_left: false,
-					big_right: false,
-					wallslide_anim_up: false,
-					wallslide_anim_down: false,
-					enemy_penetration: false,
-					nearby_enemies: 0,
+				MoveSpeed { x: 1.25, y: 3.0 },
+				Vel {
+					x: 0.0,
+					y: 0.0,
+					dir: 0.0,
 				},
-				Player,
-				PlayerStateVariables {
-					jump_frame_counter: 0,
-					jumps_remaining: 2,
-					runidle_counter: 0,
-					idlewhirl_counter: 0,
-					whirlidle_counter: 0,
-					fallidle_counter: 0,
-					walljump_counter: 0,
-					dash_counter: 0,
-					dash_cooldown: 0,
-					dash_strike_counter: 0,
-					dash_strike_cooldown: 0,
-					actively_colliding: false,
-					penetrating_enemy: false,
-					sprite_flipped: false,
+				Grav {
+					speed: 0.0,
+					max_speed: 18.0,
+					slide_speed: 3.0,
+					strength: 0.5, // leave this at 0.5, the actual gravity strength is determined by how often gravity is applied, based on a frame counter.
+					counter: 0,
 				},
-				PlayerStateBuffer {
-					old: PlayerState::default(),
-					new: PlayerState::default(),
+				(
+					PlayerInput {
+						pressing_jump: false,
+						just_pressed_jump: false,
+						pressing_left: false,
+						just_pressed_left: false,
+						pressing_right: false,
+						just_pressed_right: false,
+						pressing_dodge: false,
+						just_pressed_dodge: false,
+						pressing_skill1: false,
+						just_pressed_skill1: false,
+						pressing_skill2: false,
+						just_pressed_skill2: false,
+						pressing_skill3: false,
+						just_pressed_skill3: false,
+						pressing_skill4: false,
+						just_pressed_skill4: false,
+						pressing_up: false,
+						just_pressed_up: false,
+					},
+					PlayerCasts {
+						basic_up: false,
+						basic_down: false,
+						basic_left: false,
+						basic_right: false,
+						directional_x: false,
+						big_left: false,
+						big_right: false,
+						wallslide_anim_up: false,
+						wallslide_anim_down: false,
+						enemy_penetration: false,
+						nearby_enemies: 0,
+					},
+					// Player,
+					PlayerStateVariables {
+						jump_frame_counter: 0,
+						jumps_remaining: 2,
+						runidle_counter: 0,
+						idlewhirl_counter: 0,
+						whirlidle_counter: 0,
+						fallidle_counter: 0,
+						walljump_counter: 0,
+						dash_counter: 0,
+						dash_cooldown: 0,
+						dash_strike_counter: 0,
+						dash_strike_cooldown: 0,
+						actively_colliding: false,
+						penetrating_enemy: false,
+						sprite_flipped: false,
+					},
+					PlayerStateBuffer {
+						old: PlayerState::default(),
+						new: PlayerState::default(),
+					},
+					//should be right or default but left rn to test sprite flipping
+					Facing::Left,
+					PlayerDamage {
+						dealt: false,
+						applied: false,
+						targets: Vec::new(),
+						location: Vec3::new(0.0, 0.0, 0.0),
+						kind: DamageKind::Simple,
+						kind_mult: 1.0,
+						weapon_dmg: 24.0,
+						crit: false,
+						value: 0.0,
+						direction: 1.0,
+					},
+					PlayerDamageStats {
+						hammer_damage: 60.0,
+						sword_damage: 48.0,
+						bow_damage: 36.0,
+						guns_damage: 24.0,
+						simple_mult: 1.0,
+						whirlwind_mult: 1.2,
+						dashstrike_mult: 3.0,
+					},
+				),
+				WallKick {
+					timer: 0,
+					wall_direction: 0.0,
+					full_wallslide: false,
 				},
-				//should be right or default but left rn to test sprite flipping
-				Facing::Left,
-				PlayerDamage {
-					dealt: false,
-					applied: false,
-					targets: Vec::new(),
-					location: Vec3::new(0.0, 0.0, 0.0),
-					kind: DamageKind::Simple,
-					kind_mult: 1.0,
-					weapon_dmg: 24.0,
-					crit: false,
-					value: 0.0,
-					direction: 1.0,
+				StealthMode {
+					active: false,
+					duration: 300,
+					counter: 0,
+					speed_x: 2.25,
 				},
-				PlayerDamageStats {
-					hammer_damage: 60.0,
-					sword_damage: 48.0,
-					bow_damage: 36.0,
-					guns_damage: 24.0,
-					simple_mult: 1.0,
-					whirlwind_mult: 1.2,
-					dashstrike_mult: 3.0,
+				PlayerWeapons {
+					melee: PlayerWeaponMelee::Hammer,
+					ranged: PlayerWeaponRanged::Guns,
 				},
-			),
-			WallKick {
-				timer: 0,
-				wall_direction: 0.0,
-				full_wallslide: false,
-			},
-			StealthMode {
-				active: false,
-				duration: 300,
-				counter: 0,
-				speed_x: 2.25,
-			},
-			PlayerWeapons {
-				melee: PlayerWeaponMelee::Hammer,
-				ranged: PlayerWeaponRanged::Guns,
-			},
-			PlayerAbilities {
-				ability1: Ability::MeleeBasic,
-				ability2: Ability::RangedBasic,
-				ability3: Ability::DashForward,
-			},
-			TimeDivisions {
-				two: 0,
-				three: 0,
-				four: 0,
-				five: 0,
-				six: 0,
-				seven: 0,
-				eight: 0,
-				nine: 0,
-				ten: 0,
-				eleven: 0,
-				twelve: 0,
-				thirteen: 0,
-				fourteen: 0,
-				fifteen: 0,
-				reset: false,
-			},
-			RigidBody::KinematicPositionBased,
-			Collider::cuboid(2.0, 5.0),
-			CollisionGroups::new(Group::GROUP_2, Group::GROUP_1 | Group::GROUP_3),
-		));
+				PlayerAbilities {
+					ability1: Ability::MeleeBasic,
+					ability2: Ability::RangedBasic,
+					ability3: Ability::DashForward,
+				},
+				RigidBody::KinematicPositionBased,
+				Collider::cuboid(2.0, 5.0),
+				CollisionGroups::new(Group::GROUP_2, Group::GROUP_1 | Group::GROUP_3),
+			))
+			.id();
 		//.insert(CollisionShape::Cuboid { ..Default::default() });
 		// ...
 
@@ -185,7 +173,7 @@ pub fn setup_player(
 
 		// load sprite sheets and all that
 
-		let perfect_transitions = true;
+		// let perfect_transitions = true;
 
 		//put these in folder, load with asset_loader
 		// PRELOAD SOUNDS
@@ -400,128 +388,128 @@ pub fn setup_player(
 		);
 		let texture_atlas_handle_rbgu2 = texture_atlases.add(texture_atlas_rbgu2);
 
-		commands.insert_resource(MyPlayerSounds {
-			iceimpct1: SoundParams {
-				handle: ice_impact_1.clone(),
-				volume: 6.0,
-				looping: false,
-			},
-			iceimpct2: SoundParams {
-				handle: ice_impact_2.clone(),
-				volume: 6.0,
-				looping: false,
-			},
-			iceimpct3: SoundParams {
-				handle: ice_impact_3.clone(),
-				volume: 6.0,
-				looping: false,
-			},
-			iceimpct4: SoundParams {
-				handle: ice_impact_4.clone(),
-				volume: 6.0,
-				looping: false,
-			},
-			hmrimpct1: SoundParams {
-				handle: hammer_impact_1.clone(),
-				volume: 6.0,
-				looping: false,
-			},
-			hmrimpct2: SoundParams {
-				handle: hammer_impact_2.clone(),
-				volume: 6.0,
-				looping: false,
-			},
-			hmrimpct3: SoundParams {
-				handle: hammer_impact_3.clone(),
-				volume: 6.0,
-				looping: false,
-			},
-			hmrimpct4: SoundParams {
-				handle: hammer_impact_4.clone(),
-				volume: 6.0,
-				looping: false,
-			},
-			hmrimpct5: SoundParams {
-				handle: hammer_impact_5.clone(),
-				volume: 6.0,
-				looping: false,
-			},
-			basshit1: SoundParams {
-				handle: bass_hit_1.clone(),
-				volume: 3.0,
-				looping: false,
-			},
-			basshit2: SoundParams {
-				handle: bass_hit_2.clone(),
-				volume: 3.0,
-				looping: false,
-			},
-			step1: SoundParams {
-				handle: footstep1.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step2: SoundParams {
-				handle: footstep2.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step3: SoundParams {
-				handle: footstep3.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step4: SoundParams {
-				handle: footstep4.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step5: SoundParams {
-				handle: footstep5.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step6: SoundParams {
-				handle: footstep6.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step7: SoundParams {
-				handle: footstep7.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step8: SoundParams {
-				handle: footstep8.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step9: SoundParams {
-				handle: footstep9.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step10: SoundParams {
-				handle: footstep10.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step11: SoundParams {
-				handle: footstep11.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step12: SoundParams {
-				handle: footstep12.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-			step13: SoundParams {
-				handle: footstep13.clone(),
-				volume: 8.0,
-				looping: false,
-			},
-		});
+		// commands.insert_resource(MyPlayerSounds {
+		// 	iceimpct1: SoundParams {
+		// 		handle: ice_impact_1.clone(),
+		// 		volume: 6.0,
+		// 		looping: false,
+		// 	},
+		// 	iceimpct2: SoundParams {
+		// 		handle: ice_impact_2.clone(),
+		// 		volume: 6.0,
+		// 		looping: false,
+		// 	},
+		// 	iceimpct3: SoundParams {
+		// 		handle: ice_impact_3.clone(),
+		// 		volume: 6.0,
+		// 		looping: false,
+		// 	},
+		// 	iceimpct4: SoundParams {
+		// 		handle: ice_impact_4.clone(),
+		// 		volume: 6.0,
+		// 		looping: false,
+		// 	},
+		// 	hmrimpct1: SoundParams {
+		// 		handle: hammer_impact_1.clone(),
+		// 		volume: 6.0,
+		// 		looping: false,
+		// 	},
+		// 	hmrimpct2: SoundParams {
+		// 		handle: hammer_impact_2.clone(),
+		// 		volume: 6.0,
+		// 		looping: false,
+		// 	},
+		// 	hmrimpct3: SoundParams {
+		// 		handle: hammer_impact_3.clone(),
+		// 		volume: 6.0,
+		// 		looping: false,
+		// 	},
+		// 	hmrimpct4: SoundParams {
+		// 		handle: hammer_impact_4.clone(),
+		// 		volume: 6.0,
+		// 		looping: false,
+		// 	},
+		// 	hmrimpct5: SoundParams {
+		// 		handle: hammer_impact_5.clone(),
+		// 		volume: 6.0,
+		// 		looping: false,
+		// 	},
+		// 	basshit1: SoundParams {
+		// 		handle: bass_hit_1.clone(),
+		// 		volume: 3.0,
+		// 		looping: false,
+		// 	},
+		// 	basshit2: SoundParams {
+		// 		handle: bass_hit_2.clone(),
+		// 		volume: 3.0,
+		// 		looping: false,
+		// 	},
+		// 	step1: SoundParams {
+		// 		handle: footstep1.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step2: SoundParams {
+		// 		handle: footstep2.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step3: SoundParams {
+		// 		handle: footstep3.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step4: SoundParams {
+		// 		handle: footstep4.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step5: SoundParams {
+		// 		handle: footstep5.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step6: SoundParams {
+		// 		handle: footstep6.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step7: SoundParams {
+		// 		handle: footstep7.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step8: SoundParams {
+		// 		handle: footstep8.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step9: SoundParams {
+		// 		handle: footstep9.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step10: SoundParams {
+		// 		handle: footstep10.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step11: SoundParams {
+		// 		handle: footstep11.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step12: SoundParams {
+		// 		handle: footstep12.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// 	step13: SoundParams {
+		// 		handle: footstep13.clone(),
+		// 		volume: 8.0,
+		// 		looping: false,
+		// 	},
+		// });
 
 		commands.insert_resource(MyPlayerAnimations {
 			run: AnimationParams {
@@ -682,64 +670,109 @@ pub fn setup_player(
 
 		// spawn the entity
 
-		commands.spawn((
-			SpriteSheetBundle {
-				texture_atlas: texture_atlas_handle.clone(),
-				transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
-				visibility: Visibility::Visible,
-				..default()
-			},
-			// AnimationState::default(),
-			PlayerGraphics,
-			SoundParams {
-				handle: ice_impact_1.clone(),
-				volume: 0.6,
-				looping: false,
-			},
-			AnimationParams {
-				atlas: texture_atlas_handle.clone(),
-				start: 0,
-				restart: 0,
-				end: 8,
-				perfect_transitions,
-			},
-			PlayerInput {
-				pressing_jump: false,
-				just_pressed_jump: false,
-				pressing_left: false,
-				just_pressed_left: false,
-				pressing_right: false,
-				just_pressed_right: false,
-				pressing_dodge: false,
-				just_pressed_dodge: false,
-				pressing_skill1: false,
-				just_pressed_skill1: false,
-				pressing_skill2: false,
-				just_pressed_skill2: false,
-				pressing_skill3: false,
-				just_pressed_skill3: false,
-				pressing_skill4: false,
-				just_pressed_skill4: false,
-				pressing_up: false,
-				just_pressed_up: false,
-			},
-			TimeDivisions {
-				two: 0,
-				three: 0,
-				four: 0,
-				five: 0,
-				six: 0,
-				seven: 0,
-				eight: 0,
-				nine: 0,
-				ten: 0,
-				eleven: 0,
-				twelve: 0,
-				thirteen: 0,
-				fourteen: 0,
-				fifteen: 0,
-				reset: false,
-			},
-		));
+		// commands.spawn((
+		// 	SpriteSheetBundle {
+		// 		texture_atlas: texture_atlas_handle.clone(),
+		// 		transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
+		// 		visibility: Visibility::Visible,
+		// 		..default()
+		// 	},
+		// 	// AnimationState::default(),
+		// 	PlayerGraphics,
+		// 	SoundParams {
+		// 		handle: ice_impact_1.clone(),
+		// 		volume: 0.6,
+		// 		looping: false,
+		// 	},
+		// 	AnimationParams {
+		// 		atlas: texture_atlas_handle.clone(),
+		// 		start: 0,
+		// 		restart: 0,
+		// 		end: 8,
+		// 		perfect_transitions,
+		// 	},
+		// 	PlayerInput {
+		// 		pressing_jump: false,
+		// 		just_pressed_jump: false,
+		// 		pressing_left: false,
+		// 		just_pressed_left: false,
+		// 		pressing_right: false,
+		// 		just_pressed_right: false,
+		// 		pressing_dodge: false,
+		// 		just_pressed_dodge: false,
+		// 		pressing_skill1: false,
+		// 		just_pressed_skill1: false,
+		// 		pressing_skill2: false,
+		// 		just_pressed_skill2: false,
+		// 		pressing_skill3: false,
+		// 		just_pressed_skill3: false,
+		// 		pressing_skill4: false,
+		// 		just_pressed_skill4: false,
+		// 		pressing_up: false,
+		// 		just_pressed_up: false,
+		// 	},
+		// 	TimeDivisions {
+		// 		two: 0,
+		// 		three: 0,
+		// 		four: 0,
+		// 		five: 0,
+		// 		six: 0,
+		// 		seven: 0,
+		// 		eight: 0,
+		// 		nine: 0,
+		// 		ten: 0,
+		// 		eleven: 0,
+		// 		twelve: 0,
+		// 		thirteen: 0,
+		// 		fourteen: 0,
+		// 		fifteen: 0,
+		// 		reset: false,
+		// 	},
+		// ));
+
+		let player_entity = commands
+			.spawn((
+				SpatialBundle {
+					// transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
+					transform: transform,
+					..default()
+				},
+				Player,
+			))
+			.id();
+
+		let sprite_entity = commands
+			.spawn((
+				SpriteSheetBundle {
+					texture_atlas: player_assets.idle.clone(),
+					sprite: TextureAtlasSprite::new(0),
+					transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
+					// visibility: Visibility::Visible,
+					..default()
+				},
+				AnimationState::default(),
+				Animation(benimator::Animation::from_indices(
+					0..=0,
+					benimator::FrameRate::from_fps(12.0),
+				)),
+			))
+			.id();
+
+		commands
+			.entity(player_entity)
+			.add_child(sprite_entity)
+			.add_child(physics_entity)
+			// println!("player_entity: {:?}", player_entity);
+			// .insert(InputManagerBundle::<PlayerAction> {
+			// 	action_state: ActionState::default(),
+			// 	input_map: InputMap::new([(KeyCode::D, PlayerAction::Run)]),
+			// })
+			// .insert((
+			// 	StateMachine::default()
+			// 		.trans::<Idle>(PressedTrigger(PlayerAction::Run), Running)
+			// 		.set_trans_logging(true),
+			// 	Idle,
+			// ));
+			;
 	}
 }

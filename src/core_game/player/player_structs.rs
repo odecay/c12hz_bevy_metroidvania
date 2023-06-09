@@ -3,8 +3,12 @@ use bevy::prelude::*;
 #[derive(Component)]
 pub struct Player;
 
-#[derive(Component)]
-pub struct Camera;
+//duplicate component, camera component is already added on camera spawn by bevy
+// #[derive(Component)]
+// pub struct Camera;
+
+// #[derive(Component)]
+// pub struct PlayerGraphicsChild;
 
 #[derive(Component)]
 pub struct PlayerGraphics;
@@ -333,24 +337,25 @@ pub struct MyPlayerAnimations {
 	pub rbgu2: AnimationParams,
 }
 
-#[derive(Component, Clone)]
-pub struct TimeDivisions {
-	pub two: u32,
-	pub three: u32,
-	pub four: u32,
-	pub five: u32,
-	pub six: u32,
-	pub seven: u32,
-	pub eight: u32,
-	pub nine: u32,
-	pub ten: u32,
-	pub eleven: u32,
-	pub twelve: u32,
-	pub thirteen: u32,
-	pub fourteen: u32,
-	pub fifteen: u32,
-	pub reset: bool,
-}
+// #[derive(Component, Clone)]
+// pub struct TimeDivisions {
+// 	pub two: u32,
+// 	pub three: u32,
+// 	pub four: u32,
+// 	pub five: u32,
+// 	pub six: u32,
+// 	pub seven: u32,
+// 	pub eight: u32,
+// 	pub nine: u32,
+// 	pub ten: u32,
+// 	pub eleven: u32,
+// 	pub twelve: u32,
+// 	pub thirteen: u32,
+// 	pub fourteen: u32,
+// 	pub fifteen: u32,
+// 	pub reset: bool,
+// }
+//
 
 #[derive(Component, Clone)]
 pub struct RandomValues {
