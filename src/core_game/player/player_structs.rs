@@ -10,6 +10,18 @@ pub struct Player;
 // #[derive(Component)]
 // pub struct PlayerGraphicsChild;
 
+///tag componenet for player animation state machine entity
+#[derive(Component)]
+pub struct PlayerAnimation;
+
+///tag component for player attack state machine entity
+#[derive(Component)]
+pub struct PlayerAttack;
+
+///tag componenet for player movement state machine entity
+#[derive(Component)]
+pub struct PlayerMovement;
+
 #[derive(Component)]
 pub struct PlayerGraphics;
 

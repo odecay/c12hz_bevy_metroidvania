@@ -1,8 +1,10 @@
 use crate::core::states::AppState;
+use bevy::app::PluginGroupBuilder;
 use bevy::prelude::*;
 
 use self::state::init_input;
 use self::state::init_state;
+use self::state::PlayerStatePlugin;
 // use iyes_loopless::prelude::*;
 
 mod animate;
@@ -29,6 +31,11 @@ mod teleport_to_spawn;
 mod time_divisions;
 mod transfer_data;
 
+#[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
+pub enum Sets {
+	Setup,
+}
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
@@ -41,13 +48,15 @@ impl Plugin for PlayerPlugin {
 				// setup_player::setup_player.in_schedule(OnEnter(AppState::Loaded)),
 				setup_player::setup_player,
 				apply_system_buffers,
-				init_input,
-				init_state,
+				// init_input,
+				// init_state,
 			)
 				.chain()
+				.in_set(Sets::Setup)
 				.in_schedule(OnEnter(AppState::Loaded)),
 		)
-		.add_system(state::runnning.in_set(OnUpdate(AppState::Loaded)))
+		// .add_system(init_state.in_schedule(OnEnter(AppState::Loaded)))
+		.add_systems((state::running, state::idle).in_set(OnUpdate(AppState::Loaded)))
 		.add_systems(
 			(
 				//setup_player,
@@ -68,7 +77,17 @@ impl Plugin for PlayerPlugin {
 				player_deal_damage::player_deal_damage,
 			)
 				.chain()
-				.in_schedule(CoreSchedule::FixedUpdate),
+				.in_set(OnUpdate(AppState::Loaded)), // .in_schedule(CoreSchedule::FixedUpdate),
 		);
+	}
+}
+
+pub struct PlayerPlugins;
+
+impl PluginGroup for PlayerPlugins {
+	fn build(self) -> bevy::app::PluginGroupBuilder {
+		PluginGroupBuilder::start::<Self>()
+			.add(PlayerPlugin)
+			.add(PlayerStatePlugin)
 	}
 }

@@ -25,7 +25,7 @@ impl Plugin for AnimationPlugin {
 // 	pub perfect_transitions: bool,
 // }
 
-#[derive(Component, Clone)]
+#[derive(Component, Copy, Clone, Reflect)]
 pub enum Facing {
 	Left,
 	Right,
@@ -66,8 +66,8 @@ fn animate(
 fn animation_flip(mut query: Query<(&mut TextureAtlasSprite, &Facing)>) {
 	for (mut sprite, facing) in query.iter_mut() {
 		match facing {
-			Facing::Left => sprite.flip_x = false,
-			Facing::Right => sprite.flip_x = true,
+			Facing::Left => sprite.flip_x = true,
+			Facing::Right => sprite.flip_x = false,
 		}
 	}
 }

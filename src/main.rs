@@ -55,7 +55,7 @@ use crate::creature::creature_death::*;
 */
 
 //dont like this being here
-use crate::core_game::player::state::PlayerAction;
+use crate::core_game::player::state::PlayerMoveAction;
 
 fn main() {
 	App::new()
@@ -84,9 +84,9 @@ fn main() {
 		.add_plugin(core::setup::SetupPlugin)
 		.add_plugin(core_game::world::WorldPlugin)
 		.add_plugin(core_game::loading::LoadingPlugin)
-		.add_plugin(InputManagerPlugin::<PlayerAction>::default())
+		.add_plugin(InputManagerPlugin::<PlayerMoveAction>::default())
 		.add_plugin(StateMachinePlugin)
-		.add_plugin(core_game::player::PlayerPlugin)
+		.add_plugins(core_game::player::PlayerPlugins)
 		// .add_plugin(core_game::creature::CreaturePlugin)
 		.add_plugin(core_game::animation::AnimationPlugin)
 		.add_plugin(WorldInspectorPlugin::new())

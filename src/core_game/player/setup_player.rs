@@ -13,14 +13,25 @@ use crate::core_game::{
 use super::{
 	player_structs::{
 		Ability, AnimationParams, DamageKind, Grav, MoveSpeed, MyPlayerAnimations, MyPlayerSounds,
-		Player, PlayerAbilities, PlayerCasts, PlayerDamage, PlayerDamageStats, PlayerGraphics,
-		PlayerInput, PlayerState, PlayerStateBuffer, PlayerStateVariables, PlayerWeaponMelee,
+		Player, PlayerAbilities, PlayerAnimation, PlayerAttack, PlayerCasts, PlayerDamage,
+		PlayerDamageStats, PlayerGraphics, PlayerInput, PlayerMoveState, PlayerMovement,
+		PlayerState, PlayerStateBuffer, PlayerStateVariables, PlayerWeaponMelee,
 		PlayerWeaponRanged, PlayerWeapons, SoundParams, StealthMode, Vel, WallKick,
 	},
-	state::{Idle, PlayerAction, Running},
+	state::{Idle, PlayerMoveAction, RunningRight},
 };
 
 // use super::player_structs::*;
+
+//components used to store reference to players sub entities
+#[derive(Component, Clone, Copy, Deref)]
+pub struct AnimationSibling(Entity);
+
+// #[derive(Component, Clone, Copy)]
+// pub struct MovementSibling(Entity);
+//
+// #[derive(Component, Clone, Copy)]
+// pub struct AttackSibling(Entity);
 
 pub fn setup_player(
 	mut commands: Commands,
@@ -750,6 +761,9 @@ pub fn setup_player(
 					// visibility: Visibility::Visible,
 					..default()
 				},
+				PlayerAnimation,
+				Facing::Right,
+				// Facing::Left,
 				AnimationState::default(),
 				Animation(benimator::Animation::from_indices(
 					0..=0,
@@ -758,21 +772,19 @@ pub fn setup_player(
 			))
 			.id();
 
-		commands
-			.entity(player_entity)
-			.add_child(sprite_entity)
-			.add_child(physics_entity)
-			// println!("player_entity: {:?}", player_entity);
-			// .insert(InputManagerBundle::<PlayerAction> {
-			// 	action_state: ActionState::default(),
-			// 	input_map: InputMap::new([(KeyCode::D, PlayerAction::Run)]),
-			// })
-			// .insert((
-			// 	StateMachine::default()
-			// 		.trans::<Idle>(PressedTrigger(PlayerAction::Run), Running)
-			// 		.set_trans_logging(true),
-			// 	Idle,
-			// ));
-			;
+		let movement_entity = commands
+			.spawn((PlayerMovement, AnimationSibling(sprite_entity)))
+			.id();
+
+		let attack_entity = commands
+			.spawn((PlayerAttack, AnimationSibling(sprite_entity)))
+			.id();
+
+		commands.entity(player_entity).push_children(&[
+			sprite_entity,
+			physics_entity,
+			movement_entity,
+			attack_entity,
+		]);
 	}
 }
