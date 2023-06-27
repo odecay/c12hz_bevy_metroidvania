@@ -27,12 +27,13 @@ impl Plugin for PlayerStatePlugin {
 		&self,
 		app: &mut App,
 	) {
-		app.add_event::<MoveStateTransition>().add_systems(
+		app.add_systems(
 			(init_input, init_state)
 				.chain()
 				.after(Sets::Setup)
 				.in_schedule(OnEnter(AppState::Loaded)),
-		);
+		)
+		.add_systems((idle, running, jumping, attacking).in_set(OnUpdate(AppState::Loaded)));
 	}
 }
 
@@ -63,8 +64,6 @@ pub struct Attacking;
 //skill attacking with? or separate state for each skill?
 //skill timers?
 //
-
-pub struct MoveStateTransition;
 
 #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug)]
 pub enum PlayerMoveAction {
@@ -125,7 +124,6 @@ pub fn init_input(
 //annnd need a way to determine if player is in state that can accept new inputs??
 //player state machine for attack, movement
 //
-//can_act?
 //cancelable?
 //can input condition? incapacitated? stuns and freeze/whatnot add incapacitated componenet,
 //checked in condition.
@@ -135,27 +133,20 @@ pub fn init_input(
 //determine if can attack?
 //attack, attacking, ??
 
-pub struct StateTransitionEvent(Entity);
-
 pub fn init_state(
-	query: Query<(Entity, With<Player>)>,
+	// query: Query<(Entity, With<Player>)>,
 	movement_query: Query<(Entity, &Parent, With<PlayerMovement>)>,
 	attack_query: Query<(Entity, &Parent, With<PlayerAttack>)>,
 	// animation_query: Query<(Entity, &Parent, With<PlayerAnimation>)>,
 	mut commands: Commands,
-	// player_assets: Res<PlayerAssets>,
-	// mut world: World,
 ) {
-	//okay we want one level of abstraction, animation transitions on their own entity, switching
-	//handle for texture atlas directly
 	for (entity, _, _) in movement_query.iter() {
 		commands.entity(entity).insert((
 			StateMachine::default()
-				.trans::<Idle>(
-					JustPressedTrigger(PlayerMoveAction::MoveRight),
-					RunningRight,
-				)
-				.trans::<Idle>(JustPressedTrigger(PlayerMoveAction::MoveLeft), RunningLeft)
+				.trans::<Idle>(PressedTrigger(PlayerMoveAction::MoveRight), RunningRight)
+				.trans::<Idle>(PressedTrigger(PlayerMoveAction::MoveLeft), RunningLeft)
+				.trans::<Idle>(JustPressedTrigger(PlayerMoveAction::Jump), Jumping)
+				.trans::<AnyState>(JustPressedTrigger(PlayerMoveAction::Jump), Jumping)
 				.trans::<RunningRight>(JustReleasedTrigger(PlayerMoveAction::MoveRight), Idle)
 				.trans::<RunningRight>(JustPressedTrigger(PlayerMoveAction::MoveLeft), RunningLeft)
 				.trans::<RunningLeft>(JustReleasedTrigger(PlayerMoveAction::MoveLeft), Idle)
@@ -163,6 +154,7 @@ pub fn init_state(
 					JustPressedTrigger(PlayerMoveAction::MoveRight),
 					RunningRight,
 				)
+				.trans::<Jumping>(JustReleasedTrigger(PlayerMoveAction::Jump), Idle)
 				.set_trans_logging(true),
 			Idle,
 		));
@@ -171,6 +163,7 @@ pub fn init_state(
 		commands.entity(entity).insert((
 			StateMachine::default()
 				.trans::<Idle>(JustPressedTrigger(PlayerAttackAction::Skill1), Attacking)
+				.trans::<Attacking>(JustReleasedTrigger(PlayerAttackAction::Skill1), Idle)
 				.set_trans_logging(true),
 			Idle,
 		));
@@ -234,11 +227,54 @@ pub fn running(
 	}
 }
 
+pub fn jumping(
+	query: Query<(
+		Entity,
+		&AnimationSibling,
+		(With<PlayerMovement>, Added<Jumping>),
+	)>,
+	mut animation_query: Query<(
+		&mut Animation,
+		&mut Handle<TextureAtlas>,
+		&Parent,
+		With<PlayerAnimation>,
+	)>,
+	assets: Res<PlayerAssets>,
+) {
+	for (entity, animation_entity, _) in query.iter() {
+		if let Ok((mut animation, mut sprite, parent, _)) =
+			animation_query.get_mut(**animation_entity)
+		{
+			animation.0 =
+				benimator::Animation::from_indices(0..=2, benimator::FrameRate::from_fps(12.0));
+			*sprite = assets.jump.clone();
+		}
+	}
+}
+
 pub fn attacking(
 	query: Query<(
 		Entity,
 		&AnimationSibling,
 		(With<PlayerAttack>, With<Attacking>),
-	)>
+	)>,
+	mut animation_query: Query<(
+		&mut Animation,
+		&mut Handle<TextureAtlas>,
+		&Parent,
+		With<PlayerAnimation>,
+	)>,
+	assets: Res<PlayerAssets>,
 ) {
+	for (entity, animation_entity, _) in query.iter() {
+		if let Ok((mut animation, mut sprite, parent, _)) =
+			animation_query.get_mut(**animation_entity)
+		{
+			animation.0 =
+				benimator::Animation::from_indices(0..=4, benimator::FrameRate::from_fps(12.0));
+			*sprite = assets.hammer_1.clone();
+		} else {
+			println!("didnt contain")
+		}
+	}
 }

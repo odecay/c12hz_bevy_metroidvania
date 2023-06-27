@@ -39,11 +39,17 @@ pub struct PlayerAssets {
 	pub footstep: HashMap<String, Handle<AudioSource>>,
 
 	//animations
-	#[asset(key = "run")]
-	pub run: Handle<TextureAtlas>,
 	#[asset(key = "idle")]
 	pub idle: Handle<TextureAtlas>,
-	//add attack animations
+	#[asset(key = "run")]
+	pub run: Handle<TextureAtlas>,
+	#[asset(key = "jump")]
+	pub jump: Handle<TextureAtlas>,
+	//attack animations
+	#[asset(key = "hammer_1")]
+	pub hammer_1: Handle<TextureAtlas>,
+	#[asset(key = "hammer_2")]
+	pub hammer_2: Handle<TextureAtlas>,
 }
 
 fn check_loaded(

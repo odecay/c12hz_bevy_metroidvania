@@ -56,24 +56,24 @@ impl Plugin for PlayerPlugin {
 				.in_schedule(OnEnter(AppState::Loaded)),
 		)
 		// .add_system(init_state.in_schedule(OnEnter(AppState::Loaded)))
-		.add_systems((state::running, state::idle).in_set(OnUpdate(AppState::Loaded)))
+		// .add_systems((state::running, state::idle).in_set(OnUpdate(AppState::Loaded)))
 		.add_systems(
 			(
 				//setup_player,
 				player_casts::player_casts,
-				set_attack_state::set_attack_state,
-				set_move_state::set_move_state,
-				apply_player_state::apply_player_state,
+				// set_attack_state::set_attack_state,
+				// set_move_state::set_move_state,
+				// apply_player_state::apply_player_state,
 				movement_and_collisions::movement_and_collisions,
-				transfer_data::transfer_data,
-				teleport_to_spawn::teleport_to_spawn,
-				move_camera::move_camera,
-				screen_shake::screen_shake,
-				set_animation_state::set_animation_state,
-				switch_animation::switch_animation,
+				// transfer_data::transfer_data,
+				// teleport_to_spawn::teleport_to_spawn,
+				// move_camera::move_camera,
+				// screen_shake::screen_shake,
+				// set_animation_state::set_animation_state,
+				// switch_animation::switch_animation,
 				// time_divisions::time_divisions,
 				// animate::animate,
-				reset_player_input::reset_player_input,
+				// reset_player_input::reset_player_input,
 				player_deal_damage::player_deal_damage,
 			)
 				.chain()

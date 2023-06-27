@@ -3,6 +3,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{LdtkPlugin, LdtkSystemSet};
 use bevy_rapier2d::prelude::*;
+use core_game::player::state::PlayerAttackAction;
 use leafwing_input_manager::prelude::InputManagerPlugin;
 use seldom_state::prelude::*;
 // use iyes_loopless::prelude::*;
@@ -85,6 +86,7 @@ fn main() {
 		.add_plugin(core_game::world::WorldPlugin)
 		.add_plugin(core_game::loading::LoadingPlugin)
 		.add_plugin(InputManagerPlugin::<PlayerMoveAction>::default())
+		.add_plugin(InputManagerPlugin::<PlayerAttackAction>::default())
 		.add_plugin(StateMachinePlugin)
 		.add_plugins(core_game::player::PlayerPlugins)
 		// .add_plugin(core_game::creature::CreaturePlugin)

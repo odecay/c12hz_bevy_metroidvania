@@ -1,11 +1,4 @@
 ({
-  "run": TextureAtlas (
-    path: "player/animations/newrun4c6.png",
-    tile_size_x: 16,
-    tile_size_y: 16,
-    columns: 7,
-    rows: 1,
-  ),
 
   "idle": TextureAtlas (
     path: "player/animations/PlayerFinal.png",
@@ -15,4 +8,36 @@
     rows: 1,
   ),
 
-  })
+  "run": TextureAtlas (
+    path: "player/animations/newrun4c6.png",
+    tile_size_x: 16,
+    tile_size_y: 16,
+    columns: 7,
+    rows: 1,
+  ),
+
+  "jump": TextureAtlas (
+    path: "player/animations/jumpUp.png",
+    tile_size_x: 16,
+    tile_size_y: 16,
+    columns: 3,
+    rows: 1,
+  ),
+
+  "hammer_1": TextureAtlas (
+    path: "player/animations/hammerAttack1.png",
+    tile_size_x: 64,
+    tile_size_y: 24,
+    columns: 5,
+    rows: 1,
+  ),
+
+  "hammer_2": TextureAtlas (
+    path: "player/animations/hammerAttack2.png",
+    tile_size_x: 64,
+    tile_size_y: 24,
+    columns: 5,
+    rows: 1,
+  ),
+
+})
